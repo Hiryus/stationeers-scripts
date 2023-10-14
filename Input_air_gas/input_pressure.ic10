@@ -1,0 +1,33 @@
+#
+# Atmosphere compressor for filtrations in
+# atmospheres with low pressure.
+#
+# Connect d0 to an input device (ex: powered vent).
+# Connect d1 to a pipe analyzer in front of the
+# input device.
+#
+
+define PRESSURE_MIN 2200 # kPa
+define PRESSURE_MAX 2400 # kPa
+define MODE_INWARD 1
+
+alias AirInput d0
+alias PipeAnalyze d1
+alias PipePressure r1
+
+loop:
+yield
+l PipePressure PipeAnalyze Pressure
+bgtal PipePressure PRESSURE_MAX off
+bltal PipePressure PRESSURE_MIN on
+s db Setting PipePressure
+j loop
+
+on:
+s AirInput Mode MODE_INWARD
+s AirInput On 1
+j ra
+
+off:
+s AirInput On 0
+j ra

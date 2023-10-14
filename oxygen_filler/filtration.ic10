@@ -1,0 +1,23 @@
+#
+# Filtration oxygen filler.
+#
+# The filtration unit should have input and output
+# linked to a source of O2 (with standard
+# temperature) and the filtered output connected to
+# a canister.
+# Adjust the MAX_PRESSURE variable depending on the
+# canister type: 9k for normal canister and 18k for
+# the smart variation.
+#
+
+define MAX_PRESSURE 9000
+
+alias Active r1
+alias PressureOut r2
+
+loop:
+yield
+l PressureOut db PressureOutput
+slt Active PressureOut MAX_PRESSURE
+s db Mode Active
+j loop

@@ -1,0 +1,53 @@
+#
+# Control script for sorters.
+#
+# This script only controls one sorter (d0). It
+# outputs smeltable ores to the right (when facing
+# the inport port), an alls other items to the left.
+#
+
+define MODE_ALTERNATE 0
+define MODE_MOTHERBOARD 1
+define MODE_LOGIC 2
+
+define EXIT_NONE -1 # facing import port
+define EXIT_LEFT 0  # facing import port
+define EXIT_RIGHT 1 # facing import port
+
+define IMPORT_SLOT 0
+define EXPORT_SLOT_LEFT 1
+define EXPORT_SLOT_RIGHT 2
+
+alias Sorter d0
+alias ItemHash r1
+alias SlotOccupied r2
+
+init:
+s Sorter Mode MODE_LOGIC
+s Sorter Output EXIT_NONE
+j loop
+
+loop:
+yield
+# Check if there is an item in the input slot
+ls SlotOccupied Sorter IMPORT_SLOT Occupied
+beqz SlotOccupied loop
+# Open the right output if hash matches
+ls ItemHash Sorter IMPORT_SLOT OccupantHash
+beq ItemHash HASH("ItemCoalOre") output_right
+beq ItemHash HASH("ItemCopperOre") output_right
+beq ItemHash HASH("ItemGoldOre") output_right
+beq ItemHash HASH("ItemIronOre") output_right
+beq ItemHash HASH("ItemLeadOre") output_right
+beq ItemHash HASH("ItemNickelOre") output_right
+beq ItemHash HASH("ItemSiliconOre") output_right
+beq ItemHash HASH("ItemSilverOre") output_right
+j output_left
+
+output_left:
+s Sorter Output EXIT_LEFT
+j loop
+
+output_right:
+s Sorter Output EXIT_RIGHT
+j loop

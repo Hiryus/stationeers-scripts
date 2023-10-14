@@ -1,0 +1,46 @@
+#
+# Arc Furnaces Control
+#
+# Automatically start connected Arc Furnaces when
+# there is an item in there import port. Also keep
+# track of the number of active furnaces in the IC
+# Setting property.
+#
+
+define IMPORT_SLOT 0
+define EXPORT_SLOT 1
+
+# r0 is used to reference devices as dr0
+alias IsActive r1
+alias NbActiveFurnace r2
+alias ImportSlotOccupied r3
+alias OreHash r4
+
+loop:
+yield
+move NbActiveFurnace 0
+# for r0 = 0 ; r0 < 6 ; r0 += 1
+move r0 0
+while_loop:
+bdseal dr0 furnace
+add r0 r0 1
+blt r0 6 while_loop
+# end while
+s db Setting NbActiveFurnace
+j loop
+
+furnace:
+# If furnace is active, continue
+l IsActive dr0 Activate
+add NbActiveFurnace NbActiveFurnace IsActive
+bnez IsActive ra
+# If furnace Inport slot is empty, continue
+ls ImportSlotOccupied dr0 IMPORT_SLOT Occupied
+beqz ImportSlotOccupied ra
+# Load ore hash from import port
+ls OreHash dr0 IMPORT_SLOT OccupantHash
+s db Setting OreHash
+# Activate furnace
+s dr0 Activate 1
+s dr0 On 1
+j ra

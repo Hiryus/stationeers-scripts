@@ -1,0 +1,43 @@
+define MODE_ALTERNATE 0
+define MODE_MOTHERBOARD 1
+define MODE_LOGIC 2
+
+define EXIT_NONE -1 # facing import port
+define EXIT_LEFT 0  # facing import port
+define EXIT_RIGHT 1 # facing import port
+
+define IMPORT_SLOT 0
+define EXPORT_SLOT_LEFT 1
+define EXPORT_SLOT_RIGHT 2
+
+alias Sorter d0
+alias FurnaceIC d1
+alias ItemHash r1
+alias SmeltingHash r2
+alias SlotOccupied r3
+alias NbActiveFurnaces r4
+
+init:
+s Sorter Mode MODE_LOGIC
+s Sorter Output EXIT_NONE
+j loop
+
+loop:
+yield
+# Load data
+ls SlotOccupied Sorter IMPORT_SLOT Occupied
+ls ItemHash Sorter IMPORT_SLOT OccupantHash
+l NbActiveFurnaces FurnaceIC Setting
+# Check if there is an item in the input slot
+beqz SlotOccupied loop
+# Open if no furnace is currently smelting
+beqz NbActiveFurnaces open
+# Open if SmeltingHash == ItemHash
+beq SmeltingHash ItemHash open
+j loop
+
+open:
+move SmeltingHash ItemHash
+s Sorter Output EXIT_LEFT
+s db Setting SmeltingHash
+j loop

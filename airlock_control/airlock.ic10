@@ -1,0 +1,116 @@
+define DOOR_MODE_MANUAL 0
+define DOOR_MODE_LOGIC 1
+define VENT_MODE_OUTWARD 0
+define VENT_MODE_INWARD 1
+
+define STATE_INTERN_OPEN 0
+define STATE_INTERN_TO_EXTERN 1
+define STATE_EXTERN_OPEN 2
+define STATE_EXTERN_TO_INTERN 3
+
+alias DoorInternal d0
+alias DoorExternal d1
+alias VentInternal d2
+alias VentExternal d3
+alias GasSensor d4
+alias CentralCommand d5
+
+alias State r2
+alias ExternalDoorCall r3
+alias InternalDoorCall r4
+
+setup:
+# Reset doors
+s DoorInternal Mode DOOR_MODE_LOGIC
+s DoorExternal Mode DOOR_MODE_LOGIC
+s DoorInternal Lock 0
+s DoorExternal Lock 0
+jal reset_door_setting
+# Reset vents
+s VentExternal Mode VENT_MODE_INWARD
+s VentInternal Mode VENT_MODE_INWARD
+s VentExternal Lock 1
+s VentInternal Lock 1
+# Set initial state
+move State STATE_EXTERN_TO_INTERN
+l r0 DoorExternal Open
+select State STATE_EXTERN_OPEN r0 State
+l r0 DoorInternal Open
+select State STATE_INTERN_OPEN r0 State
+
+loop:
+yield
+beq State STATE_INTERN_OPEN open_internal
+beq State STATE_INTERN_TO_EXTERN decompress_intern
+beq State STATE_EXTERN_OPEN open_extern
+beq State STATE_EXTERN_TO_INTERN decompress_extern
+# We should never get past this point
+s db Setting State 
+j loop
+
+load_activation:
+# Look for local door activation
+l r0 DoorExternal Setting
+l r1 DoorExternal Open
+xor ExternalDoorCall r0 r1
+l r0 DoorInternal Setting
+l r1 DoorInternal Open
+xor InternalDoorCall r0 r1
+or r0 ExternalDoorCall InternalDoorCall
+s db Setting r0
+bgtz r0 transition_state
+# Look for CentralCommand state
+bdns CentralCommand ra
+l r0 CentralCommand Setting
+bne State r0 transition_state 
+j ra
+
+reset_door_setting:
+l r0 DoorExternal Open
+s DoorExternal Setting r0
+l r0 DoorInternal Open
+s DoorInternal Setting r0
+j ra
+
+transition_state:
+add State State 1
+mod State State 4
+j ra
+
+open_internal:
+s DoorInternal Open 1
+s DoorExternal Open 0
+s VentInternal On 0
+s VentExternal On 0
+jal load_activation
+jal reset_door_setting
+j loop
+
+decompress_intern:
+s DoorInternal Open 0
+s DoorExternal Open 0
+s VentInternal On 1
+s VentExternal On 0
+l r0 GasSensor Pressure
+beqz r0 transition_state
+jal reset_door_setting
+j loop
+
+open_extern:
+s DoorInternal Open 0
+s DoorExternal Open 1
+s VentInternal On 0
+s VentExternal On 0
+jal load_activation
+jal reset_door_setting
+j loop
+
+decompress_extern:
+s DoorInternal Open 0
+s DoorExternal Open 0
+s VentInternal On 0
+s VentExternal On 1
+l r0 GasSensor Pressure
+beqz r0 transition_state
+jal reset_door_setting
+j loop

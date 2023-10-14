@@ -1,0 +1,32 @@
+# Solid generator control
+#
+# Turn ON the connected coal generator (d1) if the
+# charge ratio of the connected battery (d0) is
+# lower than START_CHARGE.
+# Turn OFF the connected coal generator (d1) if the
+# charge ratio of the connected battery (d0) is
+# higher than STOP_CHARGE.
+
+define START_CHARGE 0.3
+define STOP_CHARGE 0.5
+
+alias Battery d0
+alias Generator d1
+alias BatteryCharge r1
+
+loop:
+yield
+l BatteryCharge Battery Ratio
+blt BatteryCharge START_CHARGE start
+bgt BatteryCharge STOP_CHARGE stop
+j loop
+
+start:
+s Generator On 1
+s db Setting 1
+j loop
+
+stop:
+s Generator On 0
+s db Setting 0
+j loop

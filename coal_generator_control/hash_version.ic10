@@ -1,0 +1,29 @@
+# Solid generator control
+#
+# Turn ON all connected coal generators if the avg.
+# charge ratio of connected StructureBatteryLarge is
+# lower than START_CHARGE.
+# Turn OFF all connected coal generators if the avg.
+# charge ratio of connected StructureBatteryLarge is
+# higher than STOP_CHARGE.
+# Replace "StructureBatteryLarge" by "StructureBattery"
+# if you use smaller batteries.
+
+define START_CHARGE_RATIO 0.1
+define STOP_CHARGE_RATIO 0.3
+
+loop:
+yield
+lb r0 HASH("StructureBatteryLarge") Ratio Average
+bltal r0 START_CHARGE_RATIO start
+bgtal r0 STOP_CHARGE_RATIO stop
+s db Setting r0
+j loop
+
+start:
+sb HASH("StructureSolidFuelGenerator") On 1
+j ra
+
+stop:
+sb HASH("StructureSolidFuelGenerator") On 0
+j ra

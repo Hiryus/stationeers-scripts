@@ -1,0 +1,53 @@
+alias Helmet d0
+alias Jetpack d1
+
+alias ExteriorPressure r1
+alias ExteriorTemperature r2
+alias HelmetOpened r3
+alias ReleaseAir r4
+
+loop:
+yield
+s db Filtration 1
+s db PressureSetting 90
+s db TemperatureSetting 293
+l HelmetOpened d0 Open
+l ExteriorPressure db PressureExternal
+l ExteriorTemperature db TemperatureExternal
+jal control_air_release
+jal control_helmet_status
+jal control_atmosphere
+s Helmet Lock 0
+j loop
+
+close:
+s Helmet Open 0
+s Helmet Lock 1
+s db AirRelease 1
+j loop
+
+control_air_release:
+seqz ReleaseAir HelmetOpened
+s db AirRelease ReleaseAir
+j ra
+
+control_helmet_status:
+blt ExteriorPressure 50 close
+bgt ExteriorPressure 150 close
+blt ExteriorTemperature 283 close
+bgt ExteriorTemperature 303 close
+j ra
+
+control_atmosphere:
+beqz HelmetOpened ra
+l r0 db RatioVolatiles
+bgt r0 0.01 close
+l r0 db RatioPollutant
+bgt r0 0.01 close
+l r0 db RatioNitrousOxide
+bgt r0 0.01 close
+l r0 db RatioCarbonDioxide
+bgt r0 0.01 close
+l r0 db RatioOxygen
+blt r0 0.30 close
+j ra

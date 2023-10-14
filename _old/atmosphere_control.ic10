@@ -1,0 +1,99 @@
+define PRESSURE_MIN 100
+define PRESSURE_IDEAL 110
+define PRESSURE_MAX 120
+
+define TEMPERATURE_MIN 21
+define TEMPERATURE_IDEAL 25
+define TEMPERATURE_MAX 29
+
+define GAS_RATIO_MIN 0.25
+define GAS_RATIO_IDEAL 0.35
+
+alias GasSensor d0
+alias RoomCooler d1
+alias InputGasPrimary d2
+alias InputGasSecondary d3
+alias AirPurge d4
+
+alias RoomTemperature r1
+alias RatioPrimary r2
+alias RatioSecondary r3
+alias RoomPressure r4
+
+init:
+add r0 PRESSURE_MAX 10
+s InputGasPrimary PressureExternal r0
+s InputGasSecondary PressureExternal r0
+s AirPurge PressureInternal 15000
+
+loop:
+yield
+# Load data
+l RoomPressure GasSensor Pressure
+l RatioPrimary GasSensor RatioOxygen
+l RatioSecondary GasSensor RatioCarbonDioxide
+l RoomTemperature GasSensor Temperature
+sub RoomTemperature RoomTemperature 273.15
+s db Setting RoomTemperature
+# Control temperature
+bleal RoomTemperature TEMPERATURE_MIN heater_on
+bgeal RoomTemperature TEMPERATURE_IDEAL heater_off
+bleal RoomTemperature TEMPERATURE_IDEAL cooler_off
+bgeal RoomTemperature TEMPERATURE_MAX cooler_on
+# Control pressure
+bgeal RoomPressure PRESSURE_MAX purge_on
+bleal RoomPressure PRESSURE_IDEAL purge_off
+bleal RoomPressure PRESSURE_MIN inrease_pressure
+# Control gas mix
+bleal RatioPrimary GAS_RATIO_MIN input_primary
+bgeal RatioPrimary GAS_RATIO_IDEAL stop_primary
+bleal RatioSecondary GAS_RATIO_MIN input_secondary
+bgeal RatioSecondary GAS_RATIO_IDEAL stop_secondary
+j loop
+
+purge_on:
+s AirPurge On 1
+j ra
+
+purge_off:
+s AirPurge On 0
+j ra
+
+inrease_pressure:
+blt RatioPrimary GAS_RATIO_MIN ra
+blt RatioSecondary GAS_RATIO_MIN ra
+s InputGasPrimary On 1
+s InputGasSecondary On 1
+j ra
+
+input_primary:
+s InputGasPrimary On 1
+j ra
+
+stop_primary:
+s InputGasPrimary On 0
+j ra
+
+input_secondary:
+s InputGasSecondary On 1
+j ra
+
+stop_secondary:
+s InputGasSecondary On 0
+j ra
+
+cooler_on:
+s RoomCooler On 1
+j ra
+
+cooler_off:
+s RoomCooler On 0
+j ra
+
+heater_on:
+sb HASH("StructureWallHeater") On 1
+j ra
+
+heater_off:
+sb HASH("StructureWallHeater") On 0
+j ra

@@ -1,0 +1,30 @@
+#
+# Air conditioner electricity saver.
+#
+# The air conditioner is enabled only if the
+# temperature is more than 1 degree higher or
+# lower than the target.
+#
+
+alias TargetTemperature r1
+alias CurrentTemperature r2
+alias MinTemperature r3
+alias MaxTemperature r4
+
+loop:
+yield
+l TargetTemperature db Setting
+l CurrentTemperature db TemperatureInput
+add MaxTemperature TargetTemperature 1
+sub MinTemperature TargetTemperature 1
+bltal CurrentTemperature MinTemperature on
+bgtal CurrentTemperature MaxTemperature on
+j off
+
+on:
+s db Mode 1
+j loop
+
+off:
+s db Mode 0
+j loop

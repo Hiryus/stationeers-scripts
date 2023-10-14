@@ -1,0 +1,39 @@
+define STATE_INTERN_OPEN 0
+define STATE_EXTERN_OPEN 2
+
+alias DeviceSetting r1
+alias State r2
+
+setup:
+s db Setting STATE_INTERN_OPEN
+
+loop:
+yield
+push 0
+jal read_device
+push 1
+jal read_device
+push 2
+jal read_device
+push 3
+jal read_device
+push 4
+jal read_device
+push 5
+jal read_device
+j loop
+
+read_device:
+pop r0
+bdns dr0 ra
+l DeviceSetting dr0 Setting
+s dr0 Setting 0
+bgtz DeviceSetting transition
+j ra
+
+transition:
+l State db Setting
+add State State 2
+mod State State 4
+s db Setting State
+j loop

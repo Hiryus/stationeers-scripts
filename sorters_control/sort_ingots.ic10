@@ -1,0 +1,75 @@
+#
+# Control script for sorters.
+#
+# Each device I/O is connected to a sorter and the
+# item to filter are defined in the "loop" label
+# by name.
+# Sorted item are always output right (when facing
+# the inport port), other items are output on the
+# left.
+#
+
+define MODE_ALTERNATE 0
+define MODE_MOTHERBOARD 1
+define MODE_LOGIC 2
+
+define EXIT_NONE -1 # facing import port
+define EXIT_LEFT 0  # facing import port
+define EXIT_RIGHT 1 # facing import port
+
+define IMPORT_SLOT 0
+define EXPORT_SLOT_LEFT 1
+define EXPORT_SLOT_RIGHT 2
+
+alias SorterIronIngot d0
+alias SorterCopperIngot d1
+alias SorterGoldIngot d2
+alias SorterSilverIngot d3
+alias SorterLeadIngot d4
+alias SorterNikelIngot d5
+
+# r0 is used to index the devies as dr0
+alias ItemHash r1
+alias ExpectedHash r2
+alias SlotOccupied r3
+
+loop:
+yield
+# Expected hashes to sort right (one per device)
+push HASH("ItemIronIngot")   # d0
+push HASH("ItemCopperIngot") # d1
+push HASH("ItemGoldIngot")   # d2
+push HASH("ItemSilverIngot") # d3
+push HASH("ItemLeadIngot")   # d4
+push HASH("ItemNickelIngot") # d5
+# for r0 = 5 ; r0 >= 0 ; r0 --
+move r0 6
+for_loop:
+sub r0 r0 1
+bdseal dr0 sort
+bgt r0 0 for_loop
+# end for
+j loop
+
+sort:
+pop ExpectedHash
+# Check if there is an item in the input slot
+ls SlotOccupied dr0 IMPORT_SLOT Occupied
+beqz SlotOccupied reset
+# Open the right output if hash matches
+ls ItemHash dr0 IMPORT_SLOT OccupantHash
+beq ItemHash ExpectedHash output_right
+j output_left
+
+reset:
+s dr0 Mode MODE_LOGIC
+s dr0 Output EXIT_NONE
+j ra
+
+output_left:
+s dr0 Output EXIT_LEFT
+j ra
+
+output_right:
+s dr0 Output EXIT_RIGHT
+j ra

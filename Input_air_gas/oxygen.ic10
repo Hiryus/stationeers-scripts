@@ -1,0 +1,37 @@
+#
+# Air oxygen input.
+#
+# The filtration unit should have input and output
+# linked to a source of N2 (with standard
+# temperature) and the filtered output connected to
+# the room to fill.
+# Adjust the PRESSURE_MIN and PRESSURE_MAX variable
+# depending on the pressure of N2 you want in the
+# room (other gases in the room will add to this
+# pressure).
+#
+
+define PRESSURE_MIN 25 # kPa
+define PRESSURE_MAX 30 # kPa
+
+alias GasRatio r1
+alias RoomPressure r2
+alias GasPressure r3
+alias gasSensor d0
+
+loop:
+yield
+l GasRatio gasSensor RatioOxygen
+l RoomPressure gasSensor Pressure
+mul GasPressure GasRatio RoomPressure
+bltal GasPressure PRESSURE_MIN on
+bgtal GasPressure PRESSURE_MAX off
+j loop
+
+on:
+s db Mode 1
+j ra
+
+off:
+s db Mode 0
+j ra

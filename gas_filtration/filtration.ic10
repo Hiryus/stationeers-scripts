@@ -1,0 +1,118 @@
+#
+# Filtration to extract (toxic) gas.
+#
+# Connect the fitlration input and output to the
+# room to clean up and the filtered output to the
+# atmosphere.
+# Put the filters you want to use in the slots (you
+# can use different ones). The script will
+# auto-detect.
+#
+
+alias SlotPrimaryHash r1
+alias SlotSecondaryHash r2
+alias SlotPrimaryQty r3
+alias SlotSecondaryQty r4
+
+loop:
+yield
+ls SlotPrimaryHash db 0 OccupantHash
+ls SlotSecondaryHash db 1 OccupantHash
+# Stop if both filters are empty
+ls SlotPrimaryQty db 0 Quantity
+ls SlotSecondaryQty db 1 Quantity
+add r0 SlotPrimaryQty SlotSecondaryQty
+beqz r0 disable
+# Carbon Dioxid
+beqal SlotPrimaryHash HASH("ItemGasFilterCarbonDioxide") filter_CO2
+beqal SlotPrimaryHash HASH("ItemGasFilterCarbonDioxideM") filter_CO2
+beqal SlotPrimaryHash HASH("ItemGasFilterCarbonDioxideL") filter_CO2
+beqal SlotSecondaryHash HASH("ItemGasFilterCarbonDioxide") filter_CO2
+beqal SlotSecondaryHash HASH("ItemGasFilterCarbonDioxideM") filter_CO2
+beqal SlotSecondaryHash HASH("ItemGasFilterCarbonDioxideL") filter_CO2
+# Nitrogen
+beqal SlotPrimaryHash HASH("ItemGasFilterNitrogen") filter_N
+beqal SlotPrimaryHash HASH("ItemGasFilterNitrogenM") filter_N
+beqal SlotPrimaryHash HASH("ItemGasFilterNitrogenL") filter_N
+beqal SlotSecondaryHash HASH("ItemGasFilterNitrogen") filter_N
+beqal SlotSecondaryHash HASH("ItemGasFilterNitrogenM") filter_N
+beqal SlotSecondaryHash HASH("ItemGasFilterNitrogenL") filter_N
+# Nitrous Oxide
+beqal SlotPrimaryHash HASH("ItemGasFilterNitrousOxide") filter_N2O
+beqal SlotPrimaryHash HASH("ItemGasFilterNitrousOxideM") filter_N2O
+beqal SlotPrimaryHash HASH("ItemGasFilterNitrousOxideL") filter_N2O
+beqal SlotSecondaryHash HASH("ItemGasFilterNitrousOxide") filter_N2O
+beqal SlotSecondaryHash HASH("ItemGasFilterNitrousOxideM") filter_N2O
+beqal SlotSecondaryHash HASH("ItemGasFilterNitrousOxideL") filter_N2O
+# Oxygen
+beqal SlotPrimaryHash HASH("ItemGasFilterOxygen") filter_O2
+beqal SlotPrimaryHash HASH("ItemGasFilterOxygenM") filter_O2
+beqal SlotPrimaryHash HASH("ItemGasFilterOxygenL") filter_O2
+beqal SlotSecondaryHash HASH("ItemGasFilterOxygen") filter_O2
+beqal SlotSecondaryHash HASH("ItemGasFilterOxygenM") filter_O2
+beqal SlotSecondaryHash HASH("ItemGasFilterOxygenL") filter_O2
+# Polutants
+beqal SlotPrimaryHash HASH("ItemGasFilterPollutants") filter_polutants
+beqal SlotPrimaryHash HASH("ItemGasFilterPollutantsM") filter_polutants
+beqal SlotPrimaryHash HASH("ItemGasFilterPollutantsL") filter_polutants
+beqal SlotSecondaryHash HASH("ItemGasFilterPollutants") filter_polutants
+beqal SlotSecondaryHash HASH("ItemGasFilterPollutantsM") filter_polutants
+beqal SlotSecondaryHash HASH("ItemGasFilterPollutantsL") filter_polutants
+# Volatiles
+beqal SlotPrimaryHash HASH("ItemGasFilterVolatiles") filter_volatiles
+beqal SlotPrimaryHash HASH("ItemGasFilterVolatilesM") filter_volatiles
+beqal SlotPrimaryHash HASH("ItemGasFilterVolatilesL") filter_volatiles
+beqal SlotSecondaryHash HASH("ItemGasFilterVolatiles") filter_volatiles
+beqal SlotSecondaryHash HASH("ItemGasFilterVolatilesM") filter_volatiles
+beqal SlotSecondaryHash HASH("ItemGasFilterVolatilesL") filter_volatiles
+# Water
+beqal SlotPrimaryHash HASH("ItemGasFilterWater") filter_H2O
+beqal SlotPrimaryHash HASH("ItemGasFilterWaterM") filter_H2O
+beqal SlotPrimaryHash HASH("ItemGasFilterWaterL") filter_H2O
+beqal SlotSecondaryHash HASH("ItemGasFilterWater") filter_H2O
+beqal SlotSecondaryHash HASH("ItemGasFilterWaterM") filter_H2O
+beqal SlotSecondaryHash HASH("ItemGasFilterWaterL") filter_H2O
+j disable
+
+filter_CO2:
+l r0 db RatioCarbonDioxideInput
+bgtz r0 enable
+j ra
+
+filter_H2O:
+l r0 db RatioWaterInput
+bgtz r0 enable
+j ra
+
+filter_N:
+l r0 db RatioNitrogenInput
+bgtz r0 enable
+j ra
+
+filter_N2O:
+l r0 db RatioNitrousOxideInput
+bgtz r0 enable
+j ra
+
+filter_O2:
+l r0 db RatioOxygenInput
+bgtz r0 enable
+j ra
+
+filter_polutants:
+l r0 db RatioPollutantInput
+bgtz r0 enable
+j ra
+
+filter_volatiles:
+l r0 db RatioVolatilesInput
+bgtz r0 enable
+j ra
+
+disable:
+s db Mode 0
+j loop
+
+enable:
+s db Mode 1
+j loop

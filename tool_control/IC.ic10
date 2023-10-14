@@ -1,0 +1,91 @@
+#
+# Control up to three machines (autolathe,
+# pipe bender, eletronic printer, etc.) to shut them
+# down when idle for too long.
+#
+# Also synchronize the status of the machine stacker
+# (if machine is ON, the stacker is turned ON and
+# if the machine is nturned OFF, the stacker is
+# turned OFF).
+#
+
+define IDLE_DELAY 60
+
+alias Tool_1 d0
+alias Tool_2 d1
+alias Tool_3 d2
+alias Stacker_1 d3
+alias Stacker_2 d4
+alias Stacker_3 d5
+
+alias IdleTime_1 r1
+alias IdleTime_2 r2
+alias IdleTime_3 r3
+
+loop:
+yield
+# Increment timer (2x yield x 0.5s)
+add IdleTime_1 IdleTime_1 1
+add IdleTime_2 IdleTime_2 1
+add IdleTime_3 IdleTime_3 1
+# Reset idle timer if machine is off
+l r0 Tool_1 On
+beqzal r0 reset_timer_1
+l r0 Tool_2 On
+beqzal r0 reset_timer_2
+l r0 Tool_3 On
+beqzal r0 reset_timer_3
+# Reset idle timer if machine is working
+l r0 Tool_1 Activate
+bgtzal r0 reset_timer_1
+l r0 Tool_2 Activate
+bgtzal r0 reset_timer_2
+l r0 Tool_3 Activate
+bgtzal r0 reset_timer_3
+# Stop machine if timer > IDLE_DELAY
+bgtal IdleTime_1 IDLE_DELAY stop_tool_1
+bgtal IdleTime_2 IDLE_DELAY stop_tool_2
+bgtal IdleTime_3 IDLE_DELAY stop_tool_3
+# Set stackers status
+l r0 Tool_1 On
+s Stacker_1 On r0
+l r0 Tool_2 On
+s Stacker_2 On r0
+l r0 Tool_3 On
+s Stacker_3 On r0
+# Yield and loop
+yield
+j loop
+
+reset_timer_1:
+move IdleTime_1 0
+j ra
+
+reset_timer_2:
+move IdleTime_2 0
+j ra
+
+reset_timer_3:
+move IdleTime_3 0
+j ra
+
+stop_tool_1:
+s Tool_1 On 0
+s Stacker_1 Activate 1
+yield
+s Stacker_1 On 0
+j ra
+
+stop_tool_2:
+s Tool_2 On 0
+s Stacker_2 Activate 1
+yield
+s Stacker_2 On 0
+j ra
+
+stop_tool_3:
+s Tool_3 On 0
+s Stacker_3 Activate 1
+yield
+s Stacker_3 On 0
+j ra

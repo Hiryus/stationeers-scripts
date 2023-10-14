@@ -1,0 +1,92 @@
+define MIN_RPM 50
+define TARGET_STRESS 30
+define Kp 0.75
+define Ki 0.01
+define Kd 30
+
+define LIMITER_MIN_RPM 250
+define LIMITER_FACTOR 0.20
+define MIN_INPUT_PRESSURE 50 # kPa
+
+alias InputMixer d0
+alias CurrentRPM r1
+alias CurrentStress r2
+alias LastStress r3
+alias DeltaStress r4
+alias Err r5
+alias SumErrors r6
+alias ThrottleCommand r7
+alias LimiterCommand r8
+alias Up r9
+alias Ui r10
+alias Ud r11
+alias InputPressure r11
+alias ActivateMixer r12
+
+init:
+move LastStress 0
+move SumErrors 0
+s db Open 0
+
+start:
+yield
+# Load current values
+l CurrentRPM db Rpm
+l CurrentStress db Stress
+# Manage input gas
+jal input
+# If RPM > 1000, switch to fixed value
+bgt CurrentRPM 1000 cruise_mode
+# Set throttle and limiter
+jal throttle
+jal limiter
+# Update last value
+move LastStress CurrentStress
+j start
+
+input:
+# If InputPressure < MIN_INPUT_PRESSURE, mixer on
+# Else, mixer off
+l InputPressure db PressureInput
+slt ActivateMixer InputPressure MIN_INPUT_PRESSURE
+s InputMixer On ActivateMixer
+j ra
+
+limiter:
+# limiter_cmd = LIMITER_FACTOR * (RPM - LIMITER_MIN_RPM)
+sub r0 CurrentRPM LIMITER_MIN_RPM
+mul LimiterCommand r0 LIMITER_FACTOR
+# Set limiter command
+s db CombustionLimiter LimiterCommand
+j ra
+
+throttle:
+push ra
+# Up = Kp * error = Kp * (target_stress - current_stress)
+sub Err TARGET_STRESS CurrentStress
+mul Up Kp Err
+# Ui = Ki * SUM(err)
+add SumErrors SumErrors Err
+bltal CurrentRPM MIN_RPM reset_integral
+mul Ui Ki SumErrors
+# Ud = Kd * delta_error = Kd * (current_stress - last_stress)
+sub DeltaStress CurrentStress LastStress
+mul Ud DeltaStress Kd
+# U = Up + Ui - Ud
+add ThrottleCommand Up Ui
+sub ThrottleCommand ThrottleCommand Ud
+# Set throttle command
+s db Throttle ThrottleCommand
+pop ra
+j ra
+
+reset_integral:
+# Since stress is very chaotic at low RPM,
+# ignore the integral value in this situation
+move SumErrors 0
+j ra
+
+cruise_mode:
+s db Throttle 50
+s db CombustionLimiter 100
+j start
