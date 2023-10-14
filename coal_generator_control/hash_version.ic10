@@ -9,7 +9,7 @@
 # Replace "StructureBatteryLarge" by "StructureBattery"
 # if you use smaller batteries.
 
-define START_CHARGE_RATIO 0.1
+define START_CHARGE_RATIO 0.2
 define STOP_CHARGE_RATIO 0.3
 
 loop:
