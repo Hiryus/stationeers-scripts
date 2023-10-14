@@ -1,0 +1,33 @@
+#
+# Filtration electricity saver.
+#
+# Activate filtration only if there is pressure
+# in the imput pipe and at least one fitler is not
+# empty.
+#
+
+define MIN_PRESSURE 0.1 # kPa
+
+alias SlotPrimaryQty r1
+alias SlotSecondaryQty r2
+alias InputPressure r3
+
+loop:
+yield
+# Stop if both filters are empty
+ls SlotPrimaryQty db 0 Quantity
+ls SlotSecondaryQty db 1 Quantity
+add r0 SlotPrimaryQty SlotSecondaryQty
+beqz r0 disable
+# Enable if there is gas in the input pipe
+l InputPressure db PressureInput
+bgt InputPressure MIN_PRESSURE enable
+j disable
+
+enable:
+s db Mode 1
+j loop
+
+disable:
+s db Mode 0
+j loop
