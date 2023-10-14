@@ -1,0 +1,87 @@
+#
+# Turn ON and OFF lights referenced by name from 1
+# to 50.
+#
+
+alias Counter r1
+alias NbLights r2
+alias Light r3
+
+loop:
+# Turn loghts ON one by one
+jal push_lights
+move Counter 0
+for_loop_on:
+yield
+add Counter Counter 1
+pop Light
+sbn HASH("StructureLightRoundSmall") Light On 1
+blt Counter NbLights for_loop_on
+# Wait 10 seconds
+sleep 10
+# Turn loghts OFF one by one
+jal push_lights
+move Counter 0
+for_loop_off:
+yield
+add Counter Counter 1
+pop Light
+sbn HASH("StructureLightRoundSmall") Light On 0
+blt Counter NbLights for_loop_off
+# Wait 10 seconds
+sleep 5
+j loop
+
+push_lights:
+move NbLights 50
+push HASH("nono_50")
+push HASH("nono_49")
+push HASH("nono_48")
+push HASH("nono_47")
+push HASH("nono_46")
+push HASH("nono_45")
+push HASH("nono_44")
+push HASH("nono_43")
+push HASH("nono_42")
+push HASH("nono_41")
+push HASH("nono_40")
+push HASH("nono_39")
+push HASH("nono_38")
+push HASH("nono_37")
+push HASH("nono_36")
+push HASH("nono_35")
+push HASH("nono_34")
+push HASH("nono_33")
+push HASH("nono_32")
+push HASH("nono_31")
+push HASH("nono_30")
+push HASH("nono_29")
+push HASH("nono_28")
+push HASH("nono_27")
+push HASH("nono_26")
+push HASH("nono_25")
+push HASH("nono_24")
+push HASH("nono_23")
+push HASH("nono_22")
+push HASH("nono_21")
+push HASH("nono_20")
+push HASH("nono_19")
+push HASH("nono_18")
+push HASH("nono_17")
+push HASH("nono_16")
+push HASH("nono_15")
+push HASH("nono_14")
+push HASH("nono_13")
+push HASH("nono_12")
+push HASH("nono_11")
+push HASH("nono_10")
+push HASH("nono_9")
+push HASH("nono_8")
+push HASH("nono_7")
+push HASH("nono_6")
+push HASH("nono_5")
+push HASH("nono_4")
+push HASH("nono_3")
+push HASH("nono_2")
+push HASH("nono_1")
+j ra
