@@ -1,0 +1,43 @@
+# Max pressure in the output pipes
+define MAX_PRESSURE 40000 # kPa
+
+alias SlotPrimaryQty r3
+alias SlotSecondaryQty r4
+alias NetworkPressure r5
+
+loop:
+yield
+jal check_filters
+jal check_input
+jal check_outputs
+j enable
+
+check_filters:
+# Stop if both filters are empty
+ls SlotPrimaryQty db 0 Quantity
+ls SlotSecondaryQty db 1 Quantity
+add r0 SlotPrimaryQty SlotSecondaryQty
+beqz r0 disable
+j ra
+
+check_input:
+# Stop if input pipe is empty
+l NetworkPressure db PressureInput
+beqz NetworkPressure disable
+j ra
+
+check_outputs:
+# Stop if outputs are over limit pressure
+l NetworkPressure db PressureOutput
+bgt NetworkPressure MAX_PRESSURE disable
+l NetworkPressure db PressureOutput2
+bgt NetworkPressure MAX_PRESSURE disable
+j ra
+
+disable:
+s db Mode 0
+j loop
+
+enable:
+s db Mode 1
+j loop

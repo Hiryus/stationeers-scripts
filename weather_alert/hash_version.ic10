@@ -1,0 +1,41 @@
+#
+# Play an alert sound in the suit linked to the
+# logic transmiter d1 when a storm is incoming
+# according to weather station d0.
+# When storm is coming within 30 seconds, another
+# alert is played too.
+#
+
+define MODE_NO_STORM 0
+define MODE_INC_STORM 1
+define MODE_IN_STORM 2
+
+define ALERT_NONE 0
+define ALERT_DANGER 15
+define ALERT_WARNING 16
+define ALERT_ALERT 17
+define ALERT_STORM 18
+
+alias CountDown r1
+alias WeatherMode r2
+alias AlertType r3
+
+loop:
+yield
+lb WeatherMode HASH("StructureWeatherStation") Mode Average
+lb CountDown HASH("StructureWeatherStation") NextWeatherEventTime Average
+beqal WeatherMode MODE_INC_STORM alert_storm
+beqal WeatherMode MODE_NO_STORM reset
+s db Setting WeatherMode
+j loop
+
+alert_storm:
+sb HASH("StructureLogicTransmitter") Volume 100
+slt r0 CountDown 30
+select AlertType r0 ALERT_ALERT ALERT_STORM
+sb HASH("StructureLogicTransmitter") SoundAlert AlertType
+j ra
+
+reset:
+sb HASH("StructureLogicTransmitter") ALERT_NONE SoundAlert
+j ra

@@ -11,6 +11,9 @@
 # d0.
 #
 
+# Minimum ratio of gas to start extracting
+define MIN_RATIO 0.01
+
 alias GasSensor d0
 alias SlotPrimaryHash r1
 alias SlotSecondaryHash r2
@@ -79,32 +82,32 @@ j disable
 
 filter_CO2:
 l r0 GasSensor RatioCarbonDioxide
-bgtz r0 enable
+bgt r0 MIN_RATIO enable
 j ra
 
 filter_H2O:
 l r0 GasSensor RatioWater
-bgtz r0 enable
+bgt r0 MIN_RATIO enable
 j ra
 
 filter_N:
 l r0 db RatioNitrogenInput
-bgtz r0 enable
+bgt r0 MIN_RATIO enable
 j ra
 
 filter_N2O:
 l r0 GasSensor RatioNitrousOxide
-bgtz r0 enable
+bgt r0 MIN_RATIO enable
 j ra
 
 filter_polutants:
 l r0 GasSensor RatioPollutant
-bgtz r0 enable
+bgt r0 MIN_RATIO enable
 j ra
 
 filter_volatiles:
 l r0 GasSensor RatioVolatiles
-bgtz r0 enable
+bgt r0 MIN_RATIO enable
 j ra
 
 disable:

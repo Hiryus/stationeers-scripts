@@ -17,7 +17,11 @@ define ALERT_ALERT 17
 define ALERT_STORM 18
 
 alias WeatherStation d0
-alias Transmitter d1
+alias Transmitter_1 d1
+alias Transmitter_2 d2
+alias Transmitter_3 d3
+alias Transmitter_4 d4
+alias Transmitter_5 d5
 
 alias CountDown r1
 alias WeatherMode r2
@@ -29,16 +33,24 @@ l WeatherMode WeatherStation Mode
 l CountDown WeatherStation NextWeatherEventTime
 beqal WeatherMode MODE_NO_STORM reset
 beqal WeatherMode MODE_INC_STORM alert_storm
-s Transmitter Setting CountDown
+s db Setting CountDown
 j loop
 
 alert_storm:
-s Transmitter Volume 100
 slt r0 CountDown 30
 select AlertType r0 ALERT_ALERT ALERT_STORM
-s Transmitter SoundAlert AlertType
+s Transmitter_1 SoundAlert AlertType
+s Transmitter_2 SoundAlert AlertType
+s Transmitter_3 SoundAlert AlertType
+s Transmitter_4 SoundAlert AlertType
+s Transmitter_5 SoundAlert AlertType
 j ra
 
 reset:
-s Transmitter SoundAlert ALERT_NONE
+brdns Transmitter_1 2
+s Transmitter_1 SoundAlert ALERT_NONE
+s Transmitter_2 SoundAlert ALERT_NONE
+s Transmitter_3 SoundAlert ALERT_NONE
+s Transmitter_4 SoundAlert ALERT_NONE
+s Transmitter_5 SoundAlert ALERT_NONE
 j ra

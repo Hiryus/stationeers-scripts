@@ -46,8 +46,8 @@ l r0 db RatioPollutant
 bgt r0 0.01 close
 l r0 db RatioNitrousOxide
 bgt r0 0.01 close
-l r0 db RatioCarbonDioxide
-bgt r0 0.01 close
+#l r0 db RatioCarbonDioxide
+#bgt r0 0.01 close
 l r0 db RatioOxygen
 blt r0 0.30 close
 j ra

@@ -1,0 +1,26 @@
+define PRESSURE_MIN 75 # kPa
+define PRESSURE_MAX 80 # kPa
+
+alias GasRatio r1
+alias RoomPressure r2
+alias GasPressure r3
+
+alias d.gasSensor d0
+alias d.vPump d1
+
+loop:
+yield
+l GasRatio d.gasSensor RatioNitrogen
+l RoomPressure d.gasSensor Pressure
+mul GasPressure GasRatio RoomPressure
+bltal GasPressure PRESSURE_MIN on
+bgtal GasPressure PRESSURE_MAX off
+j loop
+
+on:
+s d.vPump On 1
+j ra
+
+off:
+s d.vPump On 0
+j ra

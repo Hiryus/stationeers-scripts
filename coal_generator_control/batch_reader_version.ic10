@@ -6,21 +6,12 @@
 # Turn OFF the connected coal generator (d1) if the
 # charge ratio of the connected battery (d0) is
 # higher than STOP_CHARGE.
-# This version also display the charge as percentage
-# if a LED display is connected (d2).
 
 define START_CHARGE 0.2
 define STOP_CHARGE 0.3
 
-define MODE_NORMAL 0
-define MODE_PERCENTAGE 1
-define MODE_POWER 2
-
 alias BatchReader d0
 alias Generator d1
-alias LedDisplay d2
-alias LedDisplayBis d3
-
 alias BatteryCharge r1
 
 loop:
@@ -28,47 +19,11 @@ yield
 l BatteryCharge BatchReader Setting
 bltal BatteryCharge START_CHARGE start
 bgtal BatteryCharge STOP_CHARGE stop
-bdseal LedDisplay display
 j loop
-
-display:
-s LedDisplay Mode MODE_PERCENTAGE
-s LedDisplay Setting BatteryCharge
-s LedDisplayBis Mode MODE_PERCENTAGE
-s LedDisplayBis Setting BatteryCharge
-blt BatteryCharge 0.25 color_red
-blt BatteryCharge 0.50 color_orange
-blt BatteryCharge 0.75 color_yellow
-blt BatteryCharge 0.99 color_green
-j color_blue
-
-color_red:
-s LedDisplay Color 4
-s LedDisplayBis Color 4
-j ra
-
-color_orange:
-s LedDisplay Color 3
-s LedDisplayBis Color 3
-j ra
-
-color_yellow:
-s LedDisplay Color 5
-s LedDisplayBis Color 5
-j ra
-
-color_green:
-s LedDisplay Color 2
-s LedDisplayBis Color 2
-j ra
-
-color_blue:
-s LedDisplay Color 0
-s LedDisplayBis Color 0
-j ra
 
 start:
 s Generator On 1
+s db Setting 1
 j ra
 
 stop:
