@@ -1,0 +1,92 @@
+# Minimum fuel before launch
+define MIN_FUEL 5000
+
+# Command module modes
+define MODE_IDLE 0
+define MODE_LAUNCHING 1
+define MODE_TRAVELING 2
+define MODE_ARIVED 3
+define MODE_IDLE_AT_DEST 4
+define MODE_RETURNING 5
+define MODE_RETURNED 6
+
+# Command module activation settings
+define ACTIVATE_NONE 0
+define ACTIVATE_LAUNCH 1
+define ACTIVATE_TRAVEL 2
+define ACTIVATE_STOP_TRAVEL 4
+define ACTIVATE_RETURN 5
+
+alias d.command d0
+alias d.silo d1
+alias d.miner d2
+
+alias r.mode r1
+alias r.fuelQty r2
+alias r.siloQty r3
+alias r.returnCost r4
+alias r.collectables r4
+
+loop:
+yield
+# Load data
+l r.collectables d.command CollectableGoods
+l r.fuelQty d.command Fuel
+l r.mode d.command Mode
+l r.returnCost d.command ReturnFuelCost
+l r.siloQty d.silo Quantity
+# Adjust return cost for safety
+mul r.returnCost r.returnCost 2.0
+# Wait during transient modes
+beq r.mode MODE_LAUNCHING loop
+beq r.mode MODE_ARIVED loop
+beq r.mode MODE_RETURNING loop
+beq r.mode MODE_RETURNED loop
+# Control rocket
+beq r.mode MODE_IDLE launch
+blt r.fuelQty r.returnCost return
+beq r.mode MODE_IDLE_AT_DEST mine
+beq r.mode MODE_TRAVELING travel
+s db Setting ACTIVATE_NONE
+j wait
+
+launch:
+# Wait until silo is empty
+bgt r.siloQty 0 unload
+# Wait until fuel tank is full
+blt r.fuelQty MIN_FUEL loop
+# Else, launch
+s d.silo Open 0
+s d.command Activate ACTIVATE_LAUNCH
+s db Setting ACTIVATE_LAUNCH
+j loop
+
+unload:
+s d.silo Open 1
+s db Setting ACTIVATE_NONE
+j loop
+
+mine:
+# Travel if nothing to mine at location
+beqz r.collectables travel
+# Else, activate miner
+s d.miner Activate 1
+s d.miner On 1
+s db Setting 5
+j loop
+
+travel:
+s d.command Activate ACTIVATE_TRAVEL
+s db Setting ACTIVATE_TRAVEL
+j loop
+
+return:
+#s d.miner Activate 0
+s d.command Activate ACTIVATE_RETURN
+s db Setting ACTIVATE_RETURN
+j loop
+
+wait:
+s d.command Activate ACTIVATE_NONE
+s db Setting ACTIVATE_NONE
+j loop

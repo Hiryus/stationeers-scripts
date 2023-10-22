@@ -1,0 +1,13 @@
+alias GasAnalyzer d0
+alias LedDisplay d1
+
+init:
+s LedDisplay Mode 0  # default
+s LedDisplay Color 2 # green
+
+loop:
+yield
+l r0 GasAnalyzer Temperature
+sub r0 r0 273.15
+s LedDisplay Setting r0
+j loop

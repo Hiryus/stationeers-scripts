@@ -1,0 +1,19 @@
+alias d.command d0
+alias d.silo d1
+alias d.ledFuel d3
+alias d.ledMode d4
+alias d.ledCargo d5
+
+alias r.mode r1
+alias r.fuelQty r2
+alias r.siloQty r3
+
+loop:
+yield
+l r.fuelQty d.command Fuel
+s d.ledFuel Setting r.fuelQty
+l r.mode d.command Mode
+s d.ledMode Setting r.mode
+l r.siloQty d.silo Quantity
+s d.ledCargo Setting r.siloQty
+j loop

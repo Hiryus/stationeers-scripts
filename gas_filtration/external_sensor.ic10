@@ -12,7 +12,7 @@
 #
 
 # Minimum ratio of gas to start extracting
-define MIN_RATIO 0.01
+define MIN_RATIO 0.001
 
 alias GasSensor d0
 alias SlotPrimaryHash r1
