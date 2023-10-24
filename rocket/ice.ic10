@@ -25,7 +25,7 @@ alias r.mode r1
 alias r.fuelQty r2
 alias r.siloQty r3
 alias r.returnCost r4
-alias r.collectables r4
+alias r.collectables r5
 
 loop:
 yield
