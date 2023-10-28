@@ -1,0 +1,9 @@
+define DAY_LENGTH 60 # seconds
+define NIGHT_LENGTH 60 # seconds
+
+loop:
+sb HASH("StructureGrowLight") On 1
+sleep DAY_LENGTH
+sb HASH("StructureGrowLight") On 0
+sleep NIGHT_LENGTH
+j loop
