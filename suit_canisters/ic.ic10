@@ -1,0 +1,28 @@
+# Max. pressure in canisters
+define TARGET_PRESSURE 18000 # kPa
+
+alias WasteCanister d0
+alias N2Canister d1
+alias O2Canister d2
+alias WastePump d3
+alias N2Pump d4
+alias O2Pump d5
+
+alias r.pressure r1
+alias r.activate r2
+
+loop:
+yield
+# Waste
+l r.pressure WasteCanister Pressure
+sgt r.activate r.pressure 0
+s WastePump On r.activate
+# N2
+l r.pressure N2Canister Pressure
+slt r.activate r.pressure TARGET_PRESSURE
+s N2Pump On r.activate
+# O2
+l r.pressure O2Canister Pressure
+slt r.activate r.pressure TARGET_PRESSURE
+s O2Pump On r.activate
+j loop
