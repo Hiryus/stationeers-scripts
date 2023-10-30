@@ -1,0 +1,12 @@
+alias LED d0
+alias r.charge r1
+
+init:
+s LED Mode 2  # power
+s LED Color 5 # yellow
+
+loop:
+yield
+lb r.charge HASH("StructureBatteryLarge") Charge Sum
+s LED Setting r.charge
+j loop

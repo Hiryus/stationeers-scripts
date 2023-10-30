@@ -12,6 +12,10 @@
 # * Position the sensor on the roof, facing north.
 # * Position the solar panels facing East
 # * Adjust the panels names in the script.
+# Depending on the solar panels you are using,
+# you may need to adjust their HASH name:
+# * StructureSolarPanelDualReinforced
+# * or StructureSolarPanelReinforced
 
 alias d.Sensor d0
 alias Daylight r1
@@ -25,22 +29,18 @@ l Daylight d.Sensor Activate
 l HorizontalAngle d.Sensor Horizontal
 l VerticalAngle d.Sensor Vertical
 # Also set average efficiency on the IC Housing for information
-lb r0 HASH("StructureSolarPanelDualReinforced") Ratio Average
+lb r0 HASH("StructureSolarPanelReinforced") Ratio Average
 s db Setting r0
 # If no daylight, goto :nightswitch
 blt Daylight 0.5 nightswitch
 # Convert sensor angle to panel angle
 sub VerticalAngle 90 VerticalAngle
 # Set panel angals
-sb HASH("StructureSolarPanelDualReinforced") Horizontal HorizontalAngle
 sb HASH("StructureSolarPanelReinforced") Horizontal HorizontalAngle
-sb HASH("StructureSolarPanelDualReinforced") Vertical VerticalAngle
 sb HASH("StructureSolarPanelReinforced") Vertical VerticalAngle
 j start
 
 nightswitch:
-sb HASH("StructureSolarPanelDualReinforced") Horizontal 90
 sb HASH("StructureSolarPanelReinforced") Horizontal 90
-sb HASH("StructureSolarPanelDualReinforced") Vertical 15
 sb HASH("StructureSolarPanelReinforced") Vertical 15
 j start

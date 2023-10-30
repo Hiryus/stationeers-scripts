@@ -1,7 +1,7 @@
 # Minimum fuel before launch
 define MIN_FUEL 5000
 
-# Command module modes
+# Automation module Mode options
 define MODE_IDLE 0
 define MODE_LAUNCHING 1
 define MODE_TRAVELING 2
@@ -10,16 +10,16 @@ define MODE_IDLE_AT_DEST 4
 define MODE_RETURNING 5
 define MODE_RETURNED 6
 
-# Command module activation settings
+# Automation module Activate options
 define ACTIVATE_NONE 0
 define ACTIVATE_LAUNCH 1
 define ACTIVATE_TRAVEL 2
 define ACTIVATE_STOP_TRAVEL 4
 define ACTIVATE_RETURN 5
 
-alias d.command d0
-alias d.silo d1
-alias d.miner d2
+alias AutomationModule d0
+alias MiningModule d1
+alias SiloModule d2
 
 alias r.mode r1
 alias r.fuelQty r2
@@ -30,11 +30,11 @@ alias r.collectables r5
 loop:
 yield
 # Load data
-l r.collectables d.command CollectableGoods
-l r.fuelQty d.command Fuel
-l r.mode d.command Mode
-l r.returnCost d.command ReturnFuelCost
-l r.siloQty d.silo Quantity
+l r.collectables AutomationModule CollectableGoods
+l r.fuelQty AutomationModule Fuel
+l r.mode AutomationModule Mode
+l r.returnCost AutomationModule ReturnFuelCost
+l r.siloQty SiloModule Quantity
 # Adjust return cost for safety
 mul r.returnCost r.returnCost 2.0
 # Wait during transient modes
@@ -47,8 +47,7 @@ beq r.mode MODE_IDLE launch
 blt r.fuelQty r.returnCost return
 beq r.mode MODE_IDLE_AT_DEST mine
 beq r.mode MODE_TRAVELING travel
-s db Setting ACTIVATE_NONE
-j wait
+j loop
 
 launch:
 # Wait until silo is empty
@@ -56,37 +55,36 @@ bgt r.siloQty 0 unload
 # Wait until fuel tank is full
 blt r.fuelQty MIN_FUEL loop
 # Else, launch
-s d.silo Open 0
-s d.command Activate ACTIVATE_LAUNCH
+s SiloModule Open 0
 s db Setting ACTIVATE_LAUNCH
+s AutomationModule Activate ACTIVATE_LAUNCH
+yield
+s AutomationModule Activate ACTIVATE_NONE
 j loop
 
 unload:
-s d.silo Open 1
 s db Setting ACTIVATE_NONE
+s SiloModule Open 1
 j loop
 
 mine:
 # Travel if nothing to mine at location
 beqz r.collectables travel
 # Else, activate miner
-s d.miner Activate 1
-s d.miner On 1
+s MiningModule Activate 1
 s db Setting 5
 j loop
 
 travel:
-s d.command Activate ACTIVATE_TRAVEL
 s db Setting ACTIVATE_TRAVEL
+s AutomationModule Activate ACTIVATE_TRAVEL
+yield
+s AutomationModule Activate ACTIVATE_NONE
 j loop
 
 return:
-#s d.miner Activate 0
-s d.command Activate ACTIVATE_RETURN
 s db Setting ACTIVATE_RETURN
-j loop
-
-wait:
-s d.command Activate ACTIVATE_NONE
-s db Setting ACTIVATE_NONE
+s AutomationModule Activate ACTIVATE_RETURN
+yield
+s AutomationModule Activate ACTIVATE_NONE
 j loop

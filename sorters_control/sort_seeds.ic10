@@ -1,0 +1,52 @@
+#
+# Control script for a single sorter.
+#
+# Each device I/O is connected to a sorter and the
+# item to filter are defined in the "loop" label
+# by name.
+# Sorted item are always output right (when facing
+# the inport port), other items are output on the
+# left.
+#
+
+define MODE_ALTERNATE 0
+define MODE_MOTHERBOARD 1
+define MODE_LOGIC 2
+
+define EXIT_NONE -1 # facing import port
+define EXIT_LEFT 0  # facing import port
+define EXIT_RIGHT 1 # facing import port
+
+define IMPORT_SLOT 0
+define EXPORT_SLOT_LEFT 1
+define EXPORT_SLOT_RIGHT 2
+
+alias Sorter d0
+
+alias r.itemHash r1
+alias r.slotOccupied r2
+
+loop:
+yield
+# Check if there is an item in the input slot
+ls r.slotOccupied d0 IMPORT_SLOT Occupied
+beqz r.slotOccupied reset
+# Open the right output if hash matches
+ls r.itemHash d0 IMPORT_SLOT OccupantHash
+beq r.itemHash HASH("SeedBag_Tomato")  output_right
+# Else, open left
+j output_left
+j loop
+
+reset:
+s d0 Mode MODE_LOGIC
+s d0 Output EXIT_NONE
+j loop
+
+output_left:
+s d0 Output EXIT_LEFT
+j loop
+
+output_right:
+s d0 Output EXIT_RIGHT
+j loop

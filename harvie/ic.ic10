@@ -1,0 +1,47 @@
+define HASH_HYDRO_DEVICE -1841632400
+define HASH_HARVIE 958056199
+define PLANT_SLOT 0
+
+alias r.harvie r1
+alias r.isMature r2
+alias r.tray r3
+
+loop:
+sleep 10
+move r.harvie HASH("Harvie 1")
+move r.tray HASH("Tray 1")
+jal harvest
+move r.harvie HASH("Harvie 2")
+move r.tray HASH("Tray 2")
+jal harvest
+move r.harvie HASH("Harvie 3")
+move r.tray HASH("Tray 3")
+jal harvest
+move r.harvie HASH("Harvie 4")
+move r.tray HASH("Tray 4")
+jal harvest
+move r.harvie HASH("Harvie 5")
+move r.tray HASH("Tray 5")
+jal harvest
+move r.harvie HASH("Harvie 6")
+move r.tray HASH("Tray 6")
+jal harvest
+move r.harvie HASH("Harvie 7")
+move r.tray HASH("Tray 7")
+jal harvest
+move r.harvie HASH("Harvie 8")
+move r.tray HASH("Tray 8")
+jal harvest
+move r.harvie HASH("Harvie 9")
+move r.tray HASH("Tray 9")
+jal harvest
+move r.harvie HASH("Harvie 10")
+move r.tray HASH("Tray 10")
+jal harvest
+j loop
+
+harvest:
+lbns r.isMature HASH_HYDRO_DEVICE r.tray PLANT_SLOT Mature Minimum
+beqz r.isMature ra
+sbn HASH_HARVIE r.harvie Harvest 1
+j ra
