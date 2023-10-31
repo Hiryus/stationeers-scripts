@@ -1,0 +1,48 @@
+alias SensorRoom1 d0
+alias SensorRoom2 d1
+alias SensorRoom3 d2
+alias SensorRoom4 d3
+alias SensorRoom5 d4
+alias SensorRoom6 d5
+
+alias r.RoomOccupied r1
+
+loop:
+yield
+# Room 1
+l r.RoomOccupied SensorRoom1 Activate
+sbn HASH("StructureLightLongAngled") HASH("Room_1") On r.RoomOccupied
+sbn HASH("StructureLightLong") HASH("Room_1") On r.RoomOccupied
+sbn HASH("StructureLightRound") HASH("Room_1") On r.RoomOccupied
+sbn HASH("StructureLightRoundSmall") HASH("Room_1") On r.RoomOccupied
+# Room 2
+l r.RoomOccupied SensorRoom2 Activate
+sbn HASH("StructureLightLongAngled") HASH("Room_2") On r.RoomOccupied
+sbn HASH("StructureLightLong") HASH("Room_2") On r.RoomOccupied
+sbn HASH("StructureLightRound") HASH("Room_2") On r.RoomOccupied
+sbn HASH("StructureLightRoundSmall") HASH("Room_2") On r.RoomOccupied
+# Room 3
+l r.RoomOccupied SensorRoom3 Activate
+sbn HASH("StructureLightLongAngled") HASH("Room_3") On r.RoomOccupied
+sbn HASH("StructureLightLong") HASH("Room_3") On r.RoomOccupied
+sbn HASH("StructureLightRound") HASH("Room_3") On r.RoomOccupied
+sbn HASH("StructureLightRoundSmall") HASH("Room_3") On r.RoomOccupied
+# Room 4
+l r.RoomOccupied SensorRoom4 Activate
+sbn HASH("StructureLightLongAngled") HASH("Room_4") On r.RoomOccupied
+sbn HASH("StructureLightLong") HASH("Room_4") On r.RoomOccupied
+sbn HASH("StructureLightRound") HASH("Room_4") On r.RoomOccupied
+sbn HASH("StructureLightRoundSmall") HASH("Room_4") On r.RoomOccupied
+# Room 5
+l r.RoomOccupied SensorRoom5 Activate
+sbn HASH("StructureLightLongAngled") HASH("Room_5") On r.RoomOccupied
+sbn HASH("StructureLightLong") HASH("Room_5") On r.RoomOccupied
+sbn HASH("StructureLightRound") HASH("Room_5") On r.RoomOccupied
+sbn HASH("StructureLightRoundSmall") HASH("Room_5") On r.RoomOccupied
+# Room 6
+l r.RoomOccupied SensorRoom6 Activate
+sbn HASH("StructureLightLongAngled") HASH("Room_6") On r.RoomOccupied
+sbn HASH("StructureLightLong") HASH("Room_6") On r.RoomOccupied
+sbn HASH("StructureLightRound") HASH("Room_6") On r.RoomOccupied
+sbn HASH("StructureLightRoundSmall") HASH("Room_6") On r.RoomOccupied
+j loop
