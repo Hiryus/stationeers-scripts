@@ -1,35 +1,65 @@
-define MIN_TEMPERATURE 1200
+# Automated system to burn coal + volatiles into
+# solid fuel (or, more accurately, hydrocarbon bars).
+#
+# The furnace is connected to a source of pure
+# volatiles at high temperature through a pump (d2).
+# The furnace output is connected back to the
+# volatiles # source with a one way valve. This pump
+# is only activated when needed to avoid heat loss
+# form the furnace.
+# The coal input is conencted to the furnace through
+# a digital valve (d2) which should be close to the
+# furnace.
+
+define MIN_PRESSURE 1000 # kPa
+define MIN_TEMPERATURE 1000 # K
 
 alias Furnace d0
-alias InputValve d1
+alias ReagentsValve d1
+alias VolatilesPump d2
 
-alias r.FurnaceReagents r1
-alias r.FurnaceTemperature r2
-alias r.OpenFurnace r3
-alias r.OpenValve r4
-alias r.RatioVolatiles r5
+alias r.CycleVolatiles r1
+alias r.FurnacePressure r2
+alias r.FurnaceReagents r3
+alias r.FurnaceTemperature r4
+alias r.OpenValve r5
+alias r.RatioVolatiles r6
 
 init:
-s InputValve Setting 1
+s ReagentsValve Setting 1
 
 loop:
 yield
-# Close the furnace and the valve if there is not 100%
-# volatiles in teh furnace
-l r.RatioVolatiles Furnace RatioVolatiles
-s db Setting r.RatioVolatiles
-blt r.RatioVolatiles 1 error
-# Open the valve if there is no reagent in the furnace
+# Load values.
+l r.FurnacePressure Furnace Pressure
 l r.FurnaceReagents Furnace Reagents
-seqz r.OpenValve r.FurnaceReagents
-s InputValve Open r.OpenValve
-# Open furnace if the temperature is hot enough to melt coal
 l r.FurnaceTemperature Furnace Temperature
-sgt r.OpenFurnace r.FurnaceTemperature MIN_TEMPERATURE
-s Furnace Open r.OpenFurnace
-j loop
+l r.RatioVolatiles Furnace RatioVolatiles
+# Close the furnace and the valve if there is not 100%
+# volatiles in the furnace.
+blt r.RatioVolatiles 1 error
+# Cycle volatiles in the furnace if there are reagents
+# in the furnace only.
+sgtz r.CycleVolatiles r.FurnaceReagents 
+s VolatilesPump On r.CycleVolatiles
+# Open the valve if there is no reagent in the furnace.
+seqz r.OpenValve r.FurnaceReagents
+s ReagentsValve Open r.OpenValve
+# Open furnace if the temperature is enough to melt
+# coal into solid fuel and there is enough volatiles.
+blt r.FurnaceTemperature MIN_TEMPERATURE close
+blt r.FurnacePressure MIN_PRESSURE close
+j open
 
 error:
-s InputValve Open 0
+s ReagentsValve Open 0
 s Furnace Open 0
+j loop
+
+close:
+s Furnace Open 0
+j loop
+
+open:
+s Furnace Open 1
 j loop
