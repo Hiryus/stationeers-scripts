@@ -22,7 +22,6 @@ define EXPORT_SLOT_LEFT 1
 define EXPORT_SLOT_RIGHT 2
 
 alias Sorter d0
-
 alias r.itemHash r1
 alias r.slotOccupied r2
 

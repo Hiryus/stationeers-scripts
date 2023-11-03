@@ -11,7 +11,7 @@
 # a digital valve (d2) which should be close to the
 # furnace.
 
-define MIN_PRESSURE 1000 # kPa
+define MIN_PRESSURE 1200 # kPa
 define MIN_TEMPERATURE 1000 # K
 
 alias Furnace d0
