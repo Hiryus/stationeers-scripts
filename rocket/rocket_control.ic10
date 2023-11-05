@@ -20,7 +20,6 @@ define ACTIVATE_RETURN 5
 alias AutomationModule d0
 alias MiningModule d1
 alias SiloModule d2
-
 alias r.mode r1
 alias r.fuelQty r2
 alias r.siloQty r3
@@ -56,15 +55,17 @@ bgt r.siloQty 0 unload
 blt r.fuelQty MIN_FUEL loop
 # Else, launch
 s SiloModule Open 0
-s db Setting ACTIVATE_LAUNCH
+sb HASH("StructureLargeHangerDoor") Open 1
+sleep 1
 s AutomationModule Activate ACTIVATE_LAUNCH
 yield
 s AutomationModule Activate ACTIVATE_NONE
 j loop
 
 unload:
-s db Setting ACTIVATE_NONE
 s SiloModule Open 1
+sleep 5 # to let time fot the rocket to enter
+sb HASH("StructureLargeHangerDoor") Open 0
 j loop
 
 mine:
@@ -72,18 +73,15 @@ mine:
 beqz r.collectables travel
 # Else, activate miner
 s MiningModule Activate 1
-s db Setting 5
 j loop
 
 travel:
-s db Setting ACTIVATE_TRAVEL
 s AutomationModule Activate ACTIVATE_TRAVEL
 yield
 s AutomationModule Activate ACTIVATE_NONE
 j loop
 
 return:
-s db Setting ACTIVATE_RETURN
 s AutomationModule Activate ACTIVATE_RETURN
 yield
 s AutomationModule Activate ACTIVATE_NONE

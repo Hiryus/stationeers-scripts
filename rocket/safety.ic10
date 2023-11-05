@@ -1,0 +1,39 @@
+# Automated safety return for autonomous rockets.
+# Return the rocket to its launchpad if fuel levels
+# approach the minimal.
+# No setup required. Just put the IC in the rocket
+# automation module.
+
+define MODE_IDLE 0
+define MODE_LAUNCHING 1
+define MODE_TRAVELING 2
+define MODE_ARIVED 3
+define MODE_IDLE_AT_DEST 4
+define MODE_RETURNING 5
+define MODE_RETURNED 6
+
+alias r.mode r1
+alias r.fuelQty r2
+alias r.returnCost r3
+
+init:
+# Load fuel return cost
+l r.returnCost db ReturnFuelCost
+mul r.returnCost r.returnCost 10.0
+
+loop:
+yield
+# Load data
+l r.mode db Mode
+l r.fuelQty db Fuel
+# Wait if not in space
+beq r.mode MODE_IDLE loop
+beq r.mode MODE_LAUNCHING loop
+# Wait if already returning
+beq r.mode MODE_RETURNING loop
+beq r.mode MODE_RETURNED loop
+# Wait if fuel is good
+bgt r.fuelQty r.returnCost loop
+# Else, return
+s db Activate 5
+j loop

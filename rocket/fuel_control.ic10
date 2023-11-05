@@ -1,0 +1,35 @@
+# Fuel control for an automated rocket.
+# The fuel is mixed in a tank with a gas mixer at
+# 67% H2 + 33% O2 before being injected into the
+# rocket fuel tank using a turbo pump (only when the
+# rocket is landed, of course).
+
+define MAX_FUEL_PRESSURE 8000 # kPa
+define MAX_ROCKET_PRESSURE 8000 # kPa
+
+alias FuelTank d0
+alias FuelMixer d1
+alias RocketPump d2
+alias RocketTank d3
+alias RocketHead d4
+
+alias r.activateMixer r1
+alias r.activatePump r2
+alias r.rocketMode r3
+alias r.rocketPressure r4
+alias r.tankPressure r5
+
+loop:
+yield
+# Load data
+l r.tankPressure FuelTank Pressure
+l r.rocketPressure RocketTank Pressure
+l r.rocketMode RocketHead Mode
+# Mixer control
+slt r.activateMixer r.tankPressure MAX_FUEL_PRESSURE
+s FuelMixer On r.activateMixer
+# Rocket input control
+slt r.activatePump r.rocketPressure MAX_ROCKET_PRESSURE
+select r.activatePump r.rocketMode 0 r.activatePump
+s RocketPump On r.activatePump
+j loop

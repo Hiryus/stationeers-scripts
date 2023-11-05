@@ -12,9 +12,9 @@ define LIMITER_FACTOR 0.20
 # Minimum fuel pressure to maintin in the input pie
 define MIN_INPUT_PRESSURE 50 # kPa
 # Uptime before emptying (1 yield should be 0.5 sec)
-define CYCLE_TIME 7200 # yields 
+define CYCLE_TIME 10800 # yields 
 # Time to wait to empty the centrifuge
-define EMPTY_TIME 300 # sec
+define EMPTY_TIME 600 # sec
 
 alias InputMixer d0
 alias CurrentRPM r1

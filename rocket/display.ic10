@@ -1,8 +1,15 @@
-alias d.command d0
-alias d.silo d1
-alias d.ledFuel d3
-alias d.ledMode d4
-alias d.ledCargo d5
+# LED display an automated rocket.
+# Algorithm is very simple: each tick, load the
+# variable and print them onto LED displays.
+# - LED Fuel is the fuel remaining.
+# - LED Mode is the automation module mode.
+# - LED Cargo is the quantity of the silo module.
+
+alias LedFuel d0
+alias LedMode d1
+alias LedCargo d2
+alias RocketHead d3
+alias RocketSilo d4
 
 alias r.mode r1
 alias r.fuelQty r2
@@ -10,10 +17,10 @@ alias r.siloQty r3
 
 loop:
 yield
-l r.fuelQty d.command Fuel
-s d.ledFuel Setting r.fuelQty
-l r.mode d.command Mode
-s d.ledMode Setting r.mode
-l r.siloQty d.silo Quantity
-s d.ledCargo Setting r.siloQty
+l r.fuelQty RocketHead Fuel
+l r.mode RocketHead Mode
+l r.siloQty RocketSilo Quantity
+s LedFuel Setting r.fuelQty
+s LedMode Setting r.mode
+s LedCargo Setting r.siloQty
 j loop
