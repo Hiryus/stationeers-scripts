@@ -20,11 +20,13 @@ define ACTIVATE_RETURN 5
 alias AutomationModule d0
 alias MiningModule d1
 alias SiloModule d2
+alias Switch d3
 alias r.mode r1
 alias r.fuelQty r2
 alias r.siloQty r3
 alias r.returnCost r4
 alias r.collectables r5
+alias r.OnOffSwitch r6
 
 loop:
 yield
@@ -34,6 +36,7 @@ l r.fuelQty AutomationModule Fuel
 l r.mode AutomationModule Mode
 l r.returnCost AutomationModule ReturnFuelCost
 l r.siloQty SiloModule Quantity
+l r.OnOffSwitch Switch Open
 # Adjust return cost for safety
 mul r.returnCost r.returnCost 2.0
 # Wait during transient modes
@@ -53,6 +56,8 @@ launch:
 bgt r.siloQty 0 unload
 # Wait until fuel tank is full
 blt r.fuelQty MIN_FUEL loop
+# Wait if switch is off
+beqz r.OnOffSwitch loop
 # Else, launch
 s SiloModule Open 0
 sb HASH("StructureLargeHangerDoor") Open 1

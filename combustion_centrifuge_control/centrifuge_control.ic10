@@ -11,10 +11,6 @@ define LIMITER_FACTOR 0.20
 
 # Minimum fuel pressure to maintin in the input pie
 define MIN_INPUT_PRESSURE 50 # kPa
-# Uptime before emptying (1 yield should be 0.5 sec)
-define CYCLE_TIME 10800 # yields 
-# Time to wait to empty the centrifuge
-define EMPTY_TIME 600 # sec
 
 alias InputMixer d0
 alias CurrentRPM r1
@@ -30,10 +26,8 @@ alias Ui r10
 alias Ud r11
 alias InputPressure r12
 alias ActivateMixer r13
-alias CycleTimer r14
 
 reset:
-move CycleTimer 0
 move LastStress 0
 move SumErrors 0
 s db Open 0
@@ -46,9 +40,6 @@ l CurrentRPM db Rpm
 l CurrentStress db Stress
 # Manage input gas
 jal input
-# If cycleTimer > CYCLE_TIME, empty the centrifuge
-bgt CycleTimer CYCLE_TIME empty
-add CycleTimer CycleTimer 1
 # If RPM > 1000, switch to fixed value
 bgt CurrentRPM 1000 cruise_mode
 # Set throttle and limiter
@@ -104,10 +95,3 @@ cruise_mode:
 s db Throttle 50
 s db CombustionLimiter 100
 j start
-
-empty:
-s db CombustionLimiter 100
-s db Throttle 0
-s db Open 0
-sleep EMPTY_TIME
-j reset

@@ -11,19 +11,21 @@
 # a digital valve (d2) which should be close to the
 # furnace.
 
-define MIN_PRESSURE 1200 # kPa
-define MIN_TEMPERATURE 1000 # K
+define MIN_PRESSURE 1000 # kPa
+define MIN_TEMPERATURE 950 # K
 
 alias Furnace d0
 alias ReagentsValve d1
-alias VolatilesPump d2
+alias HeatValve d2
+alias HotAnalyzer d3
 
-alias r.CycleVolatiles r1
+alias r.OpenHeatValve r1
 alias r.FurnacePressure r2
 alias r.FurnaceReagents r3
 alias r.FurnaceTemperature r4
 alias r.OpenValve r5
 alias r.RatioVolatiles r6
+alias r.HeatNetworkTemp r7
 
 init:
 s ReagentsValve Setting 1
@@ -35,13 +37,13 @@ l r.FurnacePressure Furnace Pressure
 l r.FurnaceReagents Furnace Reagents
 l r.FurnaceTemperature Furnace Temperature
 l r.RatioVolatiles Furnace RatioVolatiles
+l r.HeatNetworkTemp HotAnalyzer Temperature
 # Close the furnace and the valve if there is not 100%
 # volatiles in the furnace.
 blt r.RatioVolatiles 1 error
-# Cycle volatiles in the furnace if there are reagents
-# in the furnace only.
-sgtz r.CycleVolatiles r.FurnaceReagents 
-s VolatilesPump On r.CycleVolatiles
+# Open Heat network valve if temperature is low
+slt r.OpenHeatValve r.HeatNetworkTemp MIN_TEMPERATURE
+s HeatValve On r.OpenHeatValve
 # Open the valve if there is no reagent in the furnace.
 seqz r.OpenValve r.FurnaceReagents
 s ReagentsValve Open r.OpenValve
@@ -53,6 +55,7 @@ j open
 
 error:
 s ReagentsValve Open 0
+s HeatValve On 0
 s Furnace Open 0
 j loop
 
