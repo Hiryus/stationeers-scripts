@@ -1,22 +1,23 @@
+# Control the air purge of a room:
+# - Close the door automatically after 5s to 6s.
+# - Active the vent if the room is not totally empty.
+
 alias ActiveVent d0
 alias Door d1
 alias GasSensor d2
 
 alias r.current_pressure r1
 alias r.door_is_opened r2
-alias r.activate r2
+alias r.activate r3
 
 loop:
-yield
+sleep 1
 l r.current_pressure GasSensor Pressure
 l r.door_is_opened Door Open
 s db Setting r.current_pressure
-beq r.door_is_opened 1 close_door
 sgtz r.activate r.current_pressure
 s ActiveVent On r.activate
-j loop
-
-close_door:
-sleep 2
+beqz r.door_is_opened loop
+sleep 5
 s Door Open 0
 j loop
