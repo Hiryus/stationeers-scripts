@@ -1,0 +1,24 @@
+alias BReaderInput1 d0
+alias BReaderInput2 d1
+alias BReaderOutput d2
+alias DisplayInput1 d3
+alias DisplayInput2 d4
+alias DisplayOutput d5
+
+init:
+s DisplayInput1 Mode 1  # percentage
+s DisplayInput2 Mode 1  # percentage
+s DisplayOutput Mode 1  # percentage
+s DisplayInput1 Color 6 # white
+s DisplayInput2 Color 6 # white
+s DisplayOutput Color 6 # white
+
+loop:
+yield
+l r0 BReaderInput1 Setting
+s DisplayInput1 Setting r0
+l r0 BReaderInput2 Setting
+s DisplayInput2 Setting r0
+l r0 BReaderOutput Setting
+s DisplayOutput Setting r0
+j loop

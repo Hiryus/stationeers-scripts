@@ -9,12 +9,12 @@
 # Replace "StructureBatteryLarge" by "StructureBattery"
 # if you use smaller batteries.
 
-define START_CHARGE_RATIO 0.2
-define STOP_CHARGE_RATIO 0.3
+define START_CHARGE_RATIO 0.5
+define STOP_CHARGE_RATIO 0.9
 
 loop:
 yield
-lb r0 HASH("StructureBatteryLarge") Ratio Average
+lb r0 HASH("StructureBattery") Ratio Average
 bltal r0 START_CHARGE_RATIO start
 bgtal r0 STOP_CHARGE_RATIO stop
 s db Setting r0

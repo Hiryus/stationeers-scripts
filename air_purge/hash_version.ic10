@@ -1,0 +1,19 @@
+# Control the air purge of a room:
+# - Close the door automatically after 3s to 4s.
+# - Active the vent if the room is not totally empty.
+
+alias r.pressure r1
+alias r.door_opened r2
+alias r.activate r3
+
+loop:
+sleep 1
+lb r.pressure HASH("StructureGasSensor") Pressure Maximum
+lb r.door_opened HASH("StructureGlassDoor") Open Maximum
+s db Setting r.pressure
+sgtz r.activate r.pressure
+sb HASH("StructurePoweredVentLarge") On r.activate
+beqz r.door_opened loop
+sleep 3
+sb HASH("StructureGlassDoor") Open 0
+j loop

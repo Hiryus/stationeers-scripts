@@ -1,18 +1,24 @@
-alias AnalyzeInput d0
-alias DisplayInput d1
+alias AnalyzeInput1 d0
+alias AnalyzeInput2 d1
 alias AnalyzeOutput d2
-alias DisplayOutput d3
+alias DisplayInput1 d3
+alias DisplayInput2 d4
+alias DisplayOutput d5
 
 init:
-s DisplayInput Mode 2   # power
+s DisplayInput1 Mode 2  # power
+s DisplayInput2 Mode 2  # power
 s DisplayOutput Mode 2  # power
-s DisplayInput Color 5  # yellow
+s DisplayInput1 Color 5 # yellow
+s DisplayInput2 Color 5 # yellow
 s DisplayOutput Color 5 # yellow
 
 loop:
 yield
-l r0 AnalyzeInput PowerPotential
-s DisplayInput Setting r0
+l r0 AnalyzeInput1 PowerPotential
+s DisplayInput1 Setting r0
+l r0 AnalyzeInput2 PowerPotential
+s DisplayInput2 Setting r0
 l r0 AnalyzeOutput PowerRequired
 s DisplayOutput Setting r0
 j loop

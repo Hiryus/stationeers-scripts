@@ -1,3 +1,14 @@
+# Solid generator control
+#
+# Device 0 should be connected to a batch reader
+# reading battery charge ratio.
+# Turn ON all connected coal generator if the
+# setting of the connected batch reader (d0) is
+# lower than START_CHARGE.
+# Turn OFF all connected coal generator if the
+# setting of the connected battery (d0) is
+# higher than STOP_CHARGE.
+
 define START_CHARGE 0.2
 define STOP_CHARGE 0.3
 
@@ -7,16 +18,15 @@ alias BatteryCharge r1
 loop:
 sleep 5
 l BatteryCharge BatchReader Setting
+s db Setting BatteryCharge
 bltal BatteryCharge START_CHARGE start
 bgtal BatteryCharge STOP_CHARGE stop
 j loop
 
 start:
 sb HASH("StructureSolidFuelGenerator") On 1
-s db Setting 1
 j ra
 
 stop:
 sb HASH("StructureSolidFuelGenerator") On 0
-s db Setting 0
 j ra
