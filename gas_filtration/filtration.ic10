@@ -18,7 +18,7 @@ alias SlotPrimaryQty r3
 alias SlotSecondaryQty r4
 
 loop:
-yield
+sleep 5
 ls SlotPrimaryHash db 0 OccupantHash
 ls SlotSecondaryHash db 1 OccupantHash
 # Stop if both filters are empty

@@ -1,0 +1,24 @@
+alias ChargeReader d0
+alias RatioReader d1
+alias Analyzer d2
+alias LedCharge d3
+alias LedRatio d4
+alias LedUsage d5
+
+init:
+s LedCharge Mode 2   # power
+s LedRatio Mode 1    # percentage
+s LedUsage Mode 2    # power
+s LedCharge Color 6  # white
+s LedRatio Color 6   # white
+s LedUsage Color 6   # white
+
+loop:
+yield
+l r0 ChargeReader Setting
+s LedCharge Setting r0
+l r0 RatioReader Setting
+s LedRatio Setting r0
+l r0 Analyzer PowerActual
+s LedUsage Setting r0
+j loop

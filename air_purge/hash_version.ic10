@@ -9,11 +9,11 @@ alias r.activate r3
 loop:
 sleep 1
 lb r.pressure HASH("StructureGasSensor") Pressure Maximum
-lb r.door_opened HASH("StructureGlassDoor") Open Maximum
+lb r.door_opened HASH("StructureCompositeDoor") Open Maximum
 s db Setting r.pressure
 sgtz r.activate r.pressure
 sb HASH("StructurePoweredVentLarge") On r.activate
 beqz r.door_opened loop
 sleep 3
-sb HASH("StructureGlassDoor") Open 0
+sb HASH("StructureCompositeDoor") Open 0
 j loop
