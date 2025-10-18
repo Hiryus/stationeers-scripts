@@ -9,9 +9,10 @@
 # potential energy shortage.
 #
 # Installation:
-# * Position the sensor on the roof, facing north.
-# * Position the solar panels facing East
+# * Position the sensor on the roof facing sunrise.
+# * Position the solar panels facing sunrise
 # * Adjust the panels names in the script.
+#
 # Depending on the solar panels you are using,
 # you may need to adjust their HASH name:
 # * StructureSolarPanelDualReinforced
@@ -22,25 +23,30 @@ alias Daylight r1
 alias HorizontalAngle r2
 alias VerticalAngle r3
 
+define S_PANEL HASH("StructureSolarPanelDualReinforced")
+
 start:
-yield
 # Read sensor values
-l Daylight d.Sensor Activate
+l Daylight d.Sensor SolarIrradiance
 l HorizontalAngle d.Sensor Horizontal
 l VerticalAngle d.Sensor Vertical
-# Also set average efficiency on the IC Housing for information
-lb r0 HASH("StructureSolarPanelReinforced") Ratio Average
+# Also set average efficiency on the IC Housing
+lb r0 S_PANEL Ratio Average
 s db Setting r0
 # If no daylight, goto :nightswitch
 blt Daylight 0.5 nightswitch
 # Convert sensor angle to panel angle
 sub VerticalAngle 90 VerticalAngle
 # Set panel angals
-sb HASH("StructureSolarPanelReinforced") Horizontal HorizontalAngle
-sb HASH("StructureSolarPanelReinforced") Vertical VerticalAngle
-j start
+sb S_PANEL Horizontal HorizontalAngle
+sb S_PANEL Vertical VerticalAngle
+j end
 
 nightswitch:
-sb HASH("StructureSolarPanelReinforced") Horizontal 90
-sb HASH("StructureSolarPanelReinforced") Vertical 15
+sb S_PANEL Horizontal 0
+sb S_PANEL Vertical 15
+j end
+
+end:
+sleep 5
 j start

@@ -1,0 +1,45 @@
+define TARGET_NOS 8000 # moles
+define TARGET_VOL 8000 # moles
+
+alias VolPump d0
+alias VolAnalyzer d1
+alias VolUmbilical d2
+alias NosPump d3
+alias NosAnalyzer d4
+alias NosUmbilical d5
+
+alias current r1
+alias enable r2
+alias setting r3
+
+loop:
+jal Nos
+jal Volatiles
+yield
+j loop
+
+Nos:
+s NosAnalyzer On 1
+l current NosAnalyzer TotalMoles
+slt enable current TARGET_NOS
+sub setting TARGET_NOS current
+div setting setting 100
+ceil setting setting
+min setting setting 5
+s NosUmbilical Open enable
+s NosPump Setting setting
+s NosPump On enable
+j ra
+
+Volatiles:
+s VolAnalyzer On 1
+l current VolAnalyzer TotalMoles
+slt enable current TARGET_VOL
+sub setting TARGET_VOL current
+div setting setting 100
+ceil setting setting
+min setting setting 5
+s VolUmbilical Open enable
+s VolPump Setting setting
+s VolPump On enable
+j ra

@@ -9,18 +9,18 @@
 # setting of the connected battery (d0) is
 # higher than STOP_CHARGE.
 
-define START_CHARGE 0.2
-define STOP_CHARGE 0.3
+define START_CHARGE 0.3
+define STOP_CHARGE 0.5
 
 alias BatchReader d0
 alias BatteryCharge r1
 
 loop:
-sleep 5
 l BatteryCharge BatchReader Setting
 s db Setting BatteryCharge
 bltal BatteryCharge START_CHARGE start
 bgtal BatteryCharge STOP_CHARGE stop
+sleep 5
 j loop
 
 start:

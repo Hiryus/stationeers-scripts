@@ -1,0 +1,22 @@
+define MAX_COUNT 5
+define H_CENTRIFUGE HASH("StructureCentrifuge")
+
+alias average r1
+alias deviceCount r2
+alias importCount r3
+
+loop:
+lb deviceCount H_CENTRIFUGE On Sum
+lb importCount H_CENTRIFUGE ImportCount Sum
+div average importCount deviceCount
+s db Setting average
+bgt average MAX_COUNT open
+sleep 300
+j loop
+
+open:
+sb H_CENTRIFUGE Open 1
+sleep 60
+sb H_CENTRIFUGE Open 0
+sb H_CENTRIFUGE ClearMemory 1
+j loop

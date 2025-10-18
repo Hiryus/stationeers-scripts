@@ -1,0 +1,53 @@
+define TARGET_PRESSURE_H2 20000 # Pa
+define TARGET_PRESSURE_O2 10000 # Pa
+define PUMP_SPEED_H2 0.002
+define PUMP_SPEED_O2 0.001
+
+alias AnalyzerTarget d0
+alias PumpH2 d1
+alias PumpO2 d2
+
+alias delta r1
+alias pressureH2 r2
+alias pressureO2 r3
+alias pressureTotal r4
+alias ratioH2 r5
+alias ratioO2 r6
+alias setting r7
+
+loop:
+yield
+l pressureTotal AnalyzerTarget Pressure
+l ratioH2 AnalyzerTarget RatioVolatiles
+l ratioO2 AnalyzerTarget RatioOxygen
+mul pressureH2 ratioH2 pressureTotal
+mul pressureO2 ratioO2 pressureTotal
+jal h2
+jal o2
+j loop
+
+h2:
+sub delta TARGET_PRESSURE_H2 h2_off
+bltz delta h2_off
+mul setting delta PUMP_SPEED_H2
+s PumpH2 Setting setting
+s PumpH2 On 1
+j ra
+
+h2_off:
+s PumpH2 Setting 0
+s PumpH2 On 0
+j ra
+
+o2:
+sub delta TARGET_PRESSURE_O2 o2_off
+bltz delta o2_off
+mul setting delta PUMP_SPEED_O2
+s PumpO2 Setting setting
+s PumpO2 On 1
+j ra
+
+o2_off:
+s PumpO2 Setting 0
+s PumpO2 On 0
+j ra

@@ -1,0 +1,111 @@
+alias centrifuge db
+alias currentRPM r0
+alias previousRPM r3
+alias RPMdelta r4
+alias currentStress r2
+alias currentSetting r1
+alias minSetting r5
+alias minAdjustment r6
+alias adjustmentMultiple r7
+
+# Threshold at which LowRPM switches to HighRPM mode
+# Recommended: O2/H2: 10   NO2/H2: 200
+define TRANSITIONRPM 10
+# Minimal throttle for specific RPM levels.
+# Speeds up starts by not dropping to 0% at high RPM
+# Every 0-400 RPM 0%, 400-800 10% etc.
+define MINRPMSTEP 400
+
+# May be tweaked for custom fuel mixes or whatever
+define CRITICALSTRESS 50
+define HIGHSTRESS 25
+define LOWSTRESS 5
+
+move currentRPM 0
+move previousRPM 0
+move RPMdelta 0
+move currentStress 0
+move currentSetting 0
+move minSetting 0
+move minAdjustment 0
+move adjustmentMultiple 0
+
+mainloop:
+ min currentSetting currentSetting 100
+ max currentSetting currentSetting 0
+ move previousRPM currentRPM
+ l currentStress centrifuge Stress
+ l currentRPM centrifuge Rpm
+ move RPMdelta currentRPM
+ sub RPMdelta RPMdelta previousRPM
+ blt currentRPM TRANSITIONRPM lowstage
+ bgt currentRPM TRANSITIONRPM highstage
+ sleep 1
+ j mainloop
+
+# Low RPM mode - briefly pulse 10% throttle
+lowstage:
+ move currentSetting 0
+ move minSetting 0
+ move minAdjustment 0
+ s centrifuge Throttle 10
+ s centrifuge CombustionLimiter 10
+ sleep 1
+ s centrifuge Throttle 0
+ s centrifuge CombustionLimiter 0
+ sleep 2
+ j mainloop
+
+# High RPM mode - stress-based regulation
+highstage:
+ div adjustmentMultiple currentRPM MINRPMSTEP
+ move minSetting 0
+ jal adjustthrottle
+ # Stall recovery - RPM dropping, add throttle
+ blt RPMdelta -0.25 highstageupfast
+ bgt currentStress CRITICALSTRESS highstagedownfast
+ bgt currentStress HIGHSTRESS highstagedownslow
+ blt currentStress LOWSTRESS highstageupslow
+ sleep 1
+ j mainloop
+
+highstageupfast:
+ add currentSetting currentSetting 10
+ max currentSetting currentSetting minSetting
+ s centrifuge Throttle currentSetting
+ s centrifuge CombustionLimiter currentSetting
+ sleep 2
+ j mainloop
+
+highstageupslow:
+ add currentSetting currentSetting 10
+ max currentSetting currentSetting minSetting
+ s centrifuge Throttle currentSetting
+ s centrifuge CombustionLimiter currentSetting
+ sleep 8
+ j mainloop
+
+highstagedownfast:
+ sub currentSetting currentSetting 10
+ max currentSetting currentSetting minSetting
+ s centrifuge Throttle currentSetting
+ s centrifuge CombustionLimiter currentSetting
+ sleep 2
+ j mainloop
+
+highstagedownslow:
+ sub currentSetting currentSetting 10
+ max currentSetting currentSetting minSetting
+ s centrifuge Throttle currentSetting
+ s centrifuge CombustionLimiter currentSetting
+ sleep 8
+ j mainloop
+
+adjustthrottle:
+ bgt adjustmentMultiple 1 addminthrottle
+ j ra
+
+addminthrottle:
+ add minSetting minSetting 10
+ sub adjustmentMultiple adjustmentMultiple 1
+ j adjustthrottle

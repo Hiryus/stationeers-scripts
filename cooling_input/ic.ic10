@@ -1,0 +1,36 @@
+define PRESSURE_MAX 10000 # Pa
+
+alias Vent d0
+alias Sensor d1
+
+define INWARD 1
+define OUTWARD 0
+
+alias pressureInternal r1 # Pa
+alias temperatureExternal r2 # K
+alias temperatureInternal r3 # K
+
+loop:
+l pressureInternal Vent PressureOutput
+l temperatureInternal Vent TemperatureOutput
+l temperatureExternal Sensor Temperature
+bgt pressureInternal PRESSURE_MAX flush
+blt temperatureExternal temperatureInternal pump
+j wait
+
+flush:
+s Vent Mode OUTWARD
+s Vent On 1
+sleep 1
+j loop
+
+pump:
+s Vent Mode INWARD
+s Vent On 1
+sleep 3
+j loop
+
+wait:
+s Vent On 0
+sleep 10
+j loop
