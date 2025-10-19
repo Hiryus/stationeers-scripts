@@ -1,16 +1,12 @@
-define MAX_COUNT 5
+define MAX_COUNT 300
 define H_CENTRIFUGE HASH("StructureCentrifuge")
 
-alias average r1
-alias deviceCount r2
-alias importCount r3
+alias reagents r1
 
 loop:
-lb deviceCount H_CENTRIFUGE On Sum
-lb importCount H_CENTRIFUGE ImportCount Sum
-div average importCount deviceCount
-s db Setting average
-bgt average MAX_COUNT open
+lb reagents H_CENTRIFUGE Reagents Maximum
+s db Setting reagents
+bgt reagents MAX_COUNT open
 sleep 300
 j loop
 
