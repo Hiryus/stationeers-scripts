@@ -1,0 +1,36 @@
+define AIRLOCK HASH("StructureAirlock")
+define AIRLOCK_WIDE HASH("StructureAirlockWide")
+define COMPOSITE_DOOR HASH("StructureCompositeDoor")
+define GLASS_DOOR HASH("StructureGlassDoor")
+
+alias curCount r1
+alias lastCount r2
+
+start:
+move lastCount 0
+j loop
+
+loop:
+move curCount 0
+lb r0 AIRLOCK Open Sum
+add curCount curCount r0
+lb r0 AIRLOCK_WIDE Open Sum
+add curCount curCount r0
+lb r0 COMPOSITE_DOOR Open Sum
+add curCount curCount r0
+lb r0 GLASS_DOOR Open Sum
+add curCount curCount r0
+beq curCount lastCount close
+move lastCount curCount
+j end
+
+close:
+sb AIRLOCK Open 0
+sb AIRLOCK_WIDE Open 0
+sb COMPOSITE_DOOR Open 0
+sb GLASS_DOOR Open 0
+j end
+
+end:
+sleep 5
+j loop

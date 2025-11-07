@@ -1,0 +1,46 @@
+define PASSWORD 000001
+define RESET 1
+
+alias CodeReader d0
+alias DoorExternal d1
+alias DoorInternal d2
+alias SensorExternal d3
+alias OverrideLever d4
+
+alias code r1
+alias override r2
+alias presence r3
+
+start:
+sleep 1
+l code CodeReader Setting
+beq code PASSWORD success
+l override OverrideLever Open
+bgtz override exit
+l presence SensorExternal Activate
+bgtz presence open
+j close
+
+close:
+s DoorExternal Open 0
+s DoorInternal Open 0
+j start
+
+open:
+s DoorExternal Open 1
+s DoorInternal Open 0
+j start
+
+exit:
+s OverrideLever Open 0
+s DoorExternal Open 1
+s DoorInternal Open 1
+sleep 5
+j start
+
+success:
+sb HASH("StructureLogicDial") Setting 0
+s DoorExternal Open 0
+s DoorInternal Open 1
+sleep 5
+j start

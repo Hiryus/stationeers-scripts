@@ -1,0 +1,23 @@
+define MAX_PRESSURE 20000 # Pa
+define MIN_TEMPERATURE 274 # K
+
+alias Furnace d0
+alias pressure r1
+alias quantity r2
+alias temperature r3
+
+loop:
+l pressure Furnace Pressure
+ls quantity Furnace 0 Quantity
+l temperature Furnace Temperature
+s db Setting quantity
+beqz quantity end
+bgt pressure MAX_PRESSURE end
+bgt temperature MIN_TEMPERATURE end
+s Furnace Activate 1
+yield
+j loop
+
+end:
+sleep 5
+j loop

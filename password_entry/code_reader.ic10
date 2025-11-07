@@ -1,0 +1,20 @@
+alias device r1
+alias value r2
+
+start:
+move device 0
+move value 0
+j loop
+
+loop:
+bgt device 5 end
+mul value 10 value
+l r0 dr1 Setting
+add value value r0
+add device device 1
+j loop
+
+end:
+s db Setting value
+sleep 1
+j start
