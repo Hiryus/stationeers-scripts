@@ -1,0 +1,36 @@
+define FALSE 0
+define TARGET_TEMP 273 # K
+define TRUE 1
+
+alias Analyzer d0
+alias Heater_1 d1
+alias Heater_2 d2
+alias Heater_3 d3
+
+alias pressure r1
+alias temperature r2
+
+loop:
+l pressure Analyzer Pressure
+l temperature Analyzer Temperature
+beqz pressure disable
+bgt temperature TARGET_TEMP disable
+j enable
+
+disable:
+s Heater_1 On FALSE
+brdns Heater_2 2
+s Heater_2 On FALSE
+brdns Heater_3 2
+s Heater_3 On FALSE
+sleep 5
+j loop
+
+enable:
+s Heater_1 On TRUE
+brdns Heater_2 2
+s Heater_2 On TRUE
+brdns Heater_3 2
+s Heater_3 On TRUE
+sleep 5
+j loop

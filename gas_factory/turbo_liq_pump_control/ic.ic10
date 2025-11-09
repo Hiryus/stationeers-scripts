@@ -1,0 +1,41 @@
+define FALSE 0
+define MODE_NORMAL 0
+define MODE_REVERSED 1
+define TARGET_RATIO 0.8
+define TRUE 1
+
+alias Analyzer d0
+alias TurboPump d1
+
+alias enable r1
+alias mode r2
+alias setting r3
+alias volumeCur r4
+alias volumeMax r5
+alias volumeRatio r6
+
+loop:
+yield
+l mode TurboPump Mode
+l volumeCur Analyzer VolumeOfLiquid
+l volumeMax Analyzer Volume
+div volumeRatio volumeCur volumeMax                # volumeRatio = volumeCur / volumeMax
+s db Setting volumeRatio
+beq mode MODE_NORMAL normal
+j reversed
+
+disable:
+s TurboPump On FALSE
+j loop
+
+normal:
+bgt volumeRatio TARGET_RATIO disable
+sub setting TARGET_RATIO volumeRatio                # setting = TARGET_RATIO - volumeRatio # (0 < setting < 1)
+mul setting setting 50                              # setting = setting * 50               # (0 < setting < 50)
+max setting setting 1                               # setting = max(setting, 1)            # (1 < setting < 50)
+s TurboPump Setting setting
+j loop
+
+reversed:
+beqz volumeCur disable
+j loop
