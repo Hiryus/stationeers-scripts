@@ -1,0 +1,19 @@
+# Minimum fuel pressure to maintin in the input pie
+define MIN_INPUT_PRESSURE 500 # kPa
+# Loop sleep time when the mixer is active
+define SLEEP_ACTIVE 1 # sec
+# Loop sleep time when the mixer is idle
+define SLEEP_IDLE 60 # sec
+
+alias InputMixer d0
+alias InputPressure r1
+alias ActivateMixer r2
+alias SleepTime r3
+
+start:
+l InputPressure db PressureInput
+slt ActivateMixer InputPressure MIN_INPUT_PRESSURE
+s InputMixer On ActivateMixer
+select SleepTime ActivateMixer SLEEP_ACTIVE SLEEP_IDLE
+sleep SleepTime
+j start
