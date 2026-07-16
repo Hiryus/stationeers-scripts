@@ -1,0 +1,21 @@
+alias counter r0
+
+define DAY_LENGTH 60 # seconds
+define NIGHT_LENGTH 60 # seconds
+define REFRESH_RATE 5 # seconds
+
+loop:
+sb HASH("StructureGrowLight") On 1
+move counter DAY_LENGTH
+jal timer
+sb HASH("StructureGrowLight") On 0
+move counter NIGHT_LENGTH
+jal timer
+j loop
+
+timer:
+ble counter 0 ra
+s db Setting counter
+sub counter counter REFRESH_RATE
+sleep REFRESH_RATE
+j timer
