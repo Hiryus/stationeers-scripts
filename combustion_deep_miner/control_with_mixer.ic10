@@ -10,9 +10,13 @@ define LIMITER_MIN_RPM 250
 define LIMITER_FACTOR 0.20
 
 # Cruise mode above this value
-# Recommended: 300 for low power mix / 100 for high ones
-define CRUISE_MODE_RPM 300
+# Recommended: 350 for low power mix / 100 for high ones
+define CRUISE_MODE_RPM 350
 
+# Minimum fuel pressure to maintin in the input pie
+define MIN_INPUT_PRESSURE 500 # kPa
+
+alias InputMixer d0
 alias CurrentRPM r1
 alias CurrentStress r2
 alias LastStress r3
@@ -24,6 +28,8 @@ alias LimiterCommand r8
 alias Up r9
 alias Ui r10
 alias Ud r11
+alias InputPressure r12
+alias ActivateMixer r13
 
 reset:
 move LastStress 0
@@ -44,6 +50,12 @@ jal limiter
 # Update last value
 move LastStress CurrentStress
 j start
+
+mixer:
+l InputPressure db PressureInput
+slt ActivateMixer InputPressure MIN_INPUT_PRESSURE
+s InputMixer On ActivateMixer
+j ra
 
 limiter:
 # limiter_cmd = LIMITER_FACTOR * (RPM - LIMITER_MIN_RPM)

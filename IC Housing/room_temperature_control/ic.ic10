@@ -1,0 +1,37 @@
+define MAX_TEMERATURE 28 # °C
+define MIN_TEMPERATURE 22 # °C
+
+define FALSE 0
+define TRUE 1
+
+alias Cooler d0
+alias Heater d1
+alias Sensor d2
+
+alias rTemperature r1
+
+start:
+l rTemperature Sensor Temperature
+sub rTemperature rTemperature 273
+s db Setting rTemperature
+bgt rTemperature MAX_TEMERATURE cool
+blt rTemperature MIN_TEMPERATURE heat
+j idle
+
+cool:
+s Cooler On TRUE
+s Heater On FALSE
+sleep 30
+j start
+
+heat:
+s Cooler On FALSE
+s Heater On TRUE
+sleep 30
+j start
+
+idle:
+s Cooler On FALSE
+s Heater On FALSE
+sleep 300
+j start
