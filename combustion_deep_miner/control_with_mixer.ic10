@@ -34,11 +34,12 @@ alias ActivateMixer r13
 reset:
 move LastStress 0
 move SumErrors 0
-s db Open 0
 j start
 
 start:
 yield
+# Mix fuel
+jal mixer
 # Load current values
 l CurrentRPM db Rpm
 l CurrentStress db Stress
